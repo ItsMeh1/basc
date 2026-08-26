@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Campus Council</title>
+  <meta name="description" content="A modern student council website with elections, applications, events, and updates." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+</head>
+<body>
+  <div class="bg-glow bg-glow-a"></div>
+  <div class="bg-glow bg-glow-b"></div>
+  <header class="site-header">
+    <a class="brand" href="/" data-route="home" aria-label="Campus Council home">
+      <span class="brand-media"><img data-brand-logo alt="Campus Council logo" hidden><span class="brand-mark" data-brand-fallback>CC</span></span>
+      <span><strong data-school-name>Campus Council</strong><small data-school-tagline>Student Government</small></span>
+    </a>
+    <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
+    <nav id="mainNav"></nav>
+    <a class="header-cta" href="/apply" data-route="apply">Apply <span>↗</span></a>
+  </header>
+
+  <main id="app" tabindex="-1"></main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <div class="brand footer-brand">
+          <span class="brand-media"><img data-brand-logo alt="Campus Council logo" hidden><span class="brand-mark" data-brand-fallback>CC</span></span>
+          <span><strong data-school-name>Campus Council</strong><small data-school-tagline>Student Government</small></span>
+        </div>
+        <p class="footer-copy">Built by students, for students. Make your voice count.</p>
+      </div>
+      <div class="footer-links" id="footerLinks"></div>
+    </div>
+    <div class="footer-bottom"><span>© <span id="year"></span> Omar Abuelfoutouh</span><span></span></div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
