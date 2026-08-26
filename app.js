@@ -7,6 +7,7 @@
   const toast = document.getElementById('toast');
 
   const routeByPath = Object.fromEntries(cfg.routes.map(r => [normalizePath(r.path), r]));
+  const BASE_PATH = getBasePath();
 
   document.querySelectorAll('[data-school-name]').forEach(el => el.textContent = cfg.schoolName);
   document.querySelectorAll('[data-school-tagline]').forEach(el => el.textContent = cfg.tagline);
@@ -15,8 +16,73 @@
 
   function normalizePath(path) {
     if (!path) return '/';
-    const clean = path.split('?')[0].split('#')[0];
+    const clean = path.split('?')[0].split('#')[0].replace(/\/+/g, '/');
     return clean.length > 1 ? clean.replace(/\/$/, '') : '/';
+  }
+
+  function normalizeBasePath(path) {
+    if (!path || path === '/') return '';
+    const clean = normalizePath(path);
+    return clean.startsWith('/') ? clean : `/${clean}`;
+  }
+
+  function getBasePath() {
+    // Optional explicit basePath in config.js takes priority.
+    // Example: basePath: '/bsac'
+    if (Object.prototype.hasOwnProperty.call(cfg, 'basePath')) {
+      return normalizeBasePath(cfg.basePath);
+    }
+
+    const pathname = normalizePath(window.location.pathname);
+
+    // Site is hosted at the domain root.
+    if (pathname === '/') return '';
+
+    // If the current URL directly matches a configured route,
+    // the site is probably hosted at the domain root.
+    if (cfg.routes.some(r => normalizePath(r.path) === pathname)) {
+      return '';
+    }
+
+    // Try to detect a subdirectory from the current route.
+    const routePaths = cfg.routes
+      .map(r => normalizePath(r.path))
+      .filter(path => path !== '/')
+      .sort((a, b) => b.length - a.length);
+
+    for (const routePath of routePaths) {
+      if (pathname.endsWith(routePath)) {
+        const possibleBase = pathname.slice(0, -routePath.length);
+        if (possibleBase === '' || possibleBase === '/') return '';
+        if (possibleBase.endsWith('/')) return normalizeBasePath(possibleBase);
+      }
+    }
+
+    // If we're at /bsac, /student-council, etc., treat that as the base.
+    const segments = pathname.split('/').filter(Boolean);
+    if (segments.length === 1) return `/${segments[0]}`;
+
+    // Fallback for deeper paths.
+    return segments.length ? `/${segments[0]}` : '';
+  }
+
+  function stripBasePath(path) {
+    const clean = normalizePath(path);
+
+    if (!BASE_PATH) return clean;
+    if (clean === BASE_PATH || clean === `${BASE_PATH}/`) return '/';
+    if (clean.startsWith(`${BASE_PATH}/`)) return clean.slice(BASE_PATH.length) || '/';
+
+    return clean;
+  }
+
+  function withBasePath(path) {
+    const clean = normalizePath(path);
+
+    if (!BASE_PATH) return clean;
+    if (clean === '/') return `${BASE_PATH}/`;
+
+    return `${BASE_PATH}${clean}`;
   }
 
   function setupBranding(){
@@ -32,13 +98,14 @@
   }
 
   function routeForCurrentPath() {
-    return routeByPath[normalizePath(window.location.pathname)] || routeByPath['/'] || cfg.routes[0];
+    const appPath = stripBasePath(window.location.pathname);
+    return routeByPath[normalizePath(appPath)] || routeByPath['/'] || cfg.routes[0];
   }
 
   function navigate(path, replace = false) {
     const clean = normalizePath(path);
     const route = routeByPath[clean] || routeByPath['/'];
-    const url = route.path === '/' ? '/' : route.path;
+    const url = withBasePath(route.path);
     const method = replace ? 'replaceState' : 'pushState';
     history[method]({ route: route.anchor }, '', url);
     render(route);
@@ -47,8 +114,8 @@
 
   function render(route = routeForCurrentPath()) {
     document.title = `${route.label} · ${cfg.schoolName}`;
-    nav.innerHTML = cfg.routes.filter(r => r.nav).map(r => `<a href="${r.path}" data-route="${r.path}" class="${r.path === route.path ? 'active' : ''}">${r.label}</a>`).join('');
-    footerLinks.innerHTML = cfg.routes.filter(r => r.nav).slice(0, 5).map(r => `<a href="${r.path}" data-route="${r.path}">${r.label}</a>`).join('');
+    nav.innerHTML = cfg.routes.filter(r => r.nav).map(r => `<a href="${withBasePath(r.path)}" data-route="${r.path}" class="${normalizePath(r.path) === normalizePath(route.path) ? 'active' : ''}">${r.label}</a>`).join('');
+    footerLinks.innerHTML = cfg.routes.filter(r => r.nav).slice(0, 5).map(r => `<a href="${withBasePath(r.path)}" data-route="${r.path}">${r.label}</a>`).join('');
     app.innerHTML = pageMarkup(route.page);
     attachRouteLinks();
     attachPageHandlers(route.page);
@@ -67,7 +134,7 @@
   }
 
   function link(routePath, text, cls='btn') {
-    return `<a href="${routePath}" data-route="${routePath}" class="${cls}">${text}</a>`;
+    return `<a href="${withBasePath(routePath)}" data-route="${routePath}" class="${cls}">${text}</a>`;
   }
 
   function homePage() {
@@ -97,7 +164,7 @@
       <section class="stats section-pad">${stats}</section>
       <section class="section-pad section-intro">
         <div><div class="eyebrow">What we do</div><h2>Student-led, school-wide.</h2></div>
-        <p>From events to advocacy, council is a place to build and change things that make school feel more like yours.</p>
+        <p>From events to advocacy, council is a place to build and changethings that make school feel more like yours.</p>
       </section>
       <section class="grid-3 section-pad compact-top">${cards}</section>
       <section class="section-pad events-preview">
@@ -181,7 +248,17 @@
   function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); clearTimeout(showToast.t); showToast.t=setTimeout(()=>toast.classList.remove('show'),3000); }
 
   function attachRouteLinks(){
-    document.querySelectorAll('[data-route], a[href^="/"]').forEach(a=>a.addEventListener('click', e=>{ const href=a.getAttribute('href'); if(href && href.startsWith('/') && !href.startsWith('//')){ e.preventDefault(); navigate(href); mobileMenu?.classList.remove('open'); nav?.classList.remove('open'); }}));
+    document.querySelectorAll('[data-route]').forEach(a => {
+      a.addEventListener('click', e => {
+        const routePath = a.getAttribute('data-route');
+        if (routePath && routeByPath[normalizePath(routePath)]) {
+          e.preventDefault();
+          navigate(routePath);
+          mobileMenu?.classList.remove('open');
+          nav?.classList.remove('open');
+        }
+      });
+    });
   }
 
   function attachPageHandlers(){
@@ -190,6 +267,13 @@
 
   mobileMenu?.addEventListener('click',()=>{nav.classList.toggle('open'); mobileMenu.classList.toggle('open');});
   window.addEventListener('popstate',()=>render(routeForCurrentPath()));
-  if(window.location.pathname!=='/' && !routeByPath[normalizePath(window.location.pathname)]) history.replaceState({},'', '/');
+
+  const currentAppPath = stripBasePath(window.location.pathname);
+  const currentRoute = routeByPath[normalizePath(currentAppPath)];
+
+  if (!currentRoute && normalizePath(currentAppPath) !== '/') {
+    history.replaceState({}, '', withBasePath('/'));
+  }
+
   render();
 })();
