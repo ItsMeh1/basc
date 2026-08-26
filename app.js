@@ -197,13 +197,13 @@
     const google = cfg.googleForms?.enabled ? cfg.googleForms.apply : null;
     const useGoogle = google?.mode === 'embed' && google.embedUrl && !google.embedUrl.includes('YOUR_');
     return `<section class="page-shell section-pad" data-anchor="apply">
-      <div class="page-kicker"><span class="eyebrow">Get involved</span><span class="deadline">Applications are reviewed weekly</span></div>
+      <div class="page-kicker"><span class="eyebrow">Get involved</span><span class="deadline">Applications are reviewed ASAP.</span></div>
       <div class="split-apply">
         <div><h1>${cfg.application.title}</h1><p class="lede">${cfg.application.intro}</p>
           <div class="apply-note"><span>✦</span><div><strong>No experience required.</strong><p>Bring a point of view, a little curiosity, and a willingness to help.</p></div></div>
-          ${google && !useGoogle ? `<div class="google-form-note"><span class="eyebrow">Google Forms</span><p>Connect your official application form in <code>config.js</code>.</p>${googleButton(google)}</div>` : ''}
+          ${google && !useGoogle ? `<div class="google-form-note"><span class="eyebrow">Application</span><p><code>contact owner. error code: application config</code>.</p>${googleButton(google)}</div>` : ''}
         </div>
-        ${useGoogle ? googleEmbed(google, 'Student Council Application', 'apply') : `<div class="google-form-note"><span class="eyebrow">Application form not connected yet</span><p>Add your Google Forms <code>embedUrl</code> to <code>config.js</code> and this page will show it here.</p></div>`}
+        ${useGoogle ? googleEmbed(google, 'Student Council Application', 'apply') : `<div class="google-form-note"><span class="eyebrow">apps not connected yet</span><p><code>contact owner. error code: apps-form-config</code></p></div>`}
       </div>
     </section>`;
   }
