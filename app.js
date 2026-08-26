@@ -231,13 +231,13 @@
   }
 
   function aboutPage() {
-    return `<section class="page-shell section-pad" data-anchor="about"><span class="eyebrow">About council</span><h1>A small team with a big job.</h1><p class="lede">Student Council connects student ideas with real school decisions. We organize events, represent student feedback, and create projects that improve daily campus life.</p><div class="about-grid">${cfg.committees.map(c=>`<article class="about-card"><div class="mini-icon">${c.icon}</div><h3>${c.title}</h3><p>${c.body}</p></article>`).join('')}</div><div class="quote-card">“some random inspiring quote that makes people raise their eyebrows is meant to go here”<span>— omar abuelphotograph, 2026</span></div></section>`;
+    return `<section class="page-shell section-pad" data-anchor="about"><span class="eyebrow">About council</span><h1>A small team with a big job.</h1><p class="lede">Student Council connects student ideas with real school decisions. We organize events, represent student feedback, and create projects that improve daily campus life.</p><div class="about-grid">${cfg.committees.map(c=>`<article class="about-card"><div class="mini-icon">${c.icon}</div><h3>${c.title}</h3><p>${c.body}</p></article>`).join('')}</div><div class="quote-card">“some random inspiring quote that makes people raise their eyebrows is meant to go here”<span>— omar, 2026</span></div></section>`;
   }
 
   function faqPage() {
     const qs = [
-      ['How do I vote?', 'Open /vote and complete the official Google Form embedded on the page.'],
-      ['How do I apply?', 'Open /apply and complete the official Google Form embedded on the page.'],
+      ['How do I vote?', 'Click the vote button and complete the form. All candidates are listed and their statements are viewable.'],
+      ['How do I apply?', 'Click that big apply button & submit the form once completed.'],
       ['Can I add another page?', 'Yes. Add one route object to SITE_CONFIG.routes and add its page name to the pageMarkup switch in app.js.'],
       ['Can I change the site content?', 'Yes. Most copy, candidates, events, committees, and form fields live in config.js so you can edit them without touching the layout.']
     ];
