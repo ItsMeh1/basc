@@ -238,8 +238,8 @@
     const qs = [
       ['How do I vote?', 'Click the vote button and complete the form. All candidates are listed and their statements are viewable.'],
       ['How do I apply?', 'Click that big apply button & submit the form once completed.'],
-      ['Can I add another page?', 'Yes. Add one route object to SITE_CONFIG.routes and add its page name to the pageMarkup switch in app.js.'],
-      ['Can I change the site content?', 'Yes. Most copy, candidates, events, committees, and form fields live in config.js so you can edit them without touching the layout.']
+      ['What positions are there?', `Positions are available for every grade, and you will be notified if you've made the spot after the elections. View the form to know what positions are available for your grade.`],
+      ['What will we be doing?', 'You will be doing whatever idk whaT it is.']
     ];
     return `<section class="page-shell section-pad" data-anchor="faq"><span class="eyebrow">Help</span><h1>Frequently asked questions.</h1><div class="faq-list">${qs.map(([q,a])=>`<details><summary>${q}<span>+</span></summary><p>${a}</p></details>`).join('')}</div></section>`;
   }
