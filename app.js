@@ -1,14 +1,19 @@
 (() => {
   'use strict';
+
   const cfg = window.SITE_CONFIG || {};
   const map = window.BASC_SITE_MAP || { home: '/', aliases: {} };
   const app = document.getElementById('app');
+  const nav = document.getElementById('mainNav');
+  const footerLinks = document.getElementById('footerLinks');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const themeToggle = document.getElementById('themeToggle');
+  const year = document.getElementById('year');
   if (!app) return;
 
   const routes = Array.isArray(cfg.routes) ? cfg.routes : [];
   const routeByPath = new Map(routes.map(route => [normalize(route.path), route]));
   const pageById = cfg.pages || {};
-  const is404Shell = document.documentElement.dataset.fallback404 === 'true';
   const aliases = map.aliases || {};
 
   function normalize(path) {
@@ -35,13 +40,10 @@
     const paths = {
       'arrow-up-right': `<path d="M7 17 17 7M8 7h9v9"/>`,
       'arrow-right': `<path d="M5 12h13M13 6l6 6-6 6"/>`,
-      'arrow-left': `<path d="M19 12H5M11 18l-6-6 6-6"/>`,
-      sun: `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>`,
-      moon: `<path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/>`,
-      menu: `<path d="M4 7h16M4 12h16M4 17h16"/>`,
-      close: `<path d="m6 6 12 12M18 6 6 18"/>`,
-      check: `<path d="m5 12 4 4L19 6"/>`,
-      sparkle: `<path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z"/>`
+      'sun': `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>`,
+      'moon': `<path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/>`,
+      'check': `<path d="m5 12 4 4L19 6"/>`,
+      'sparkle': `<path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z"/>`
     };
     return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ''}</svg>`;
   }
@@ -54,9 +56,34 @@
       if (!cfg.branding?.logo) return;
       img.src = cfg.branding.logo;
       img.alt = cfg.branding.logoAlt || `${cfg.schoolName || 'Bayside Academy'} logo`;
-      img.addEventListener('load', () => { img.hidden = false; img.closest('.brand-media')?.querySelector('[data-brand-fallback]')?.setAttribute('hidden', ''); }, { once: true });
+      img.addEventListener('load', () => {
+        img.hidden = false;
+        img.closest('.brand-media')?.querySelector('[data-brand-fallback]')?.setAttribute('hidden', '');
+      }, { once: true });
       img.addEventListener('error', () => { img.hidden = true; }, { once: true });
     });
+  }
+
+  function setupTheme() {
+    let stored = null;
+    try { stored = localStorage.getItem('basc-theme'); } catch {}
+    const theme = stored === 'light' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = theme;
+    updateThemeButton(theme);
+    themeToggle?.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('basc-theme', next); } catch {}
+      updateThemeButton(next);
+    });
+  }
+
+  function updateThemeButton(theme) {
+    if (!themeToggle) return;
+    const isDark = theme === 'dark';
+    themeToggle.innerHTML = icon(isDark ? 'sun' : 'moon', 16);
+    themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeToggle.setAttribute('title', isDark ? 'Light mode' : 'Dark mode');
   }
 
   function routeLink(path, label, cls = '') {
@@ -97,14 +124,14 @@
     const p = pageById.vote || {};
     const form = cfg.googleForms?.enabled ? cfg.googleForms.vote : null;
     const ready = form?.embedUrl && !form.embedUrl.includes('YOUR_');
-    return shell('vote', `<h1>${esc(p.title || 'Cast your vote.')}</h1><p class="lede">${esc(p.body || '')}</p>${ready ? `<div class="google-embed-card"><div class="embed-heading"><div><span class="eyebrow">Official ballot</span><h3>Student Council Election</h3></div><span class="secure-badge">School form</span></div><iframe title="Official Student Council Ballot" src="${esc(form.embedUrl)}" loading="lazy"></iframe></div>` : `<div class="notice-card"><div class="notice-icon">${icon('check', 18)}</div><div><b>Ballot connection is ready to configure.</b><p>Add the real Google Forms URL in <code>config.js</code> when the ballot is published.</p>${form?.formUrl ? `<a class="btn btn-primary btn-small" href="${esc(form.formUrl)}" target="_blank" rel="noopener">Open form ${icon('arrow-up-right', 14)}</a>` : ''}</div></div>`}<div class="section-heading inner-heading"><div><div class="eyebrow">Candidates</div><h2>Meet the people running.</h2></div></div><div class="candidate-grid">${(cfg.election?.candidates || []).map(candidateCard).join('')}</div>`);
+    return shell('vote', `<h1>${esc(p.title || 'Cast your vote.')}</h1><p class="lede">${esc(p.body || '')}</p>${ready ? `<div class="google-embed-card"><div class="embed-heading"><div><span class="eyebrow">Official ballot</span><h3>Student Council Election</h3></div><span class="secure-badge">School form</span></div><iframe title="Official Student Council Ballot" src="${esc(form.embedUrl)}" loading="lazy"></iframe></div>` : `<div class="notice-card"><div class="notice-icon">${icon('check', 18)}</div><div><b>Ballot connection is ready to configure.</b><p>Add the real Google Forms URL in <code>config.js</code> when the ballot is published.</p>${form?.formUrl && !form.formUrl.includes('YOUR_') ? `<a class="btn btn-primary btn-small" href="${esc(form.formUrl)}" target="_blank" rel="noopener">Open form ${icon('arrow-up-right', 14)}</a>` : ''}</div></div>`}<div class="section-heading inner-heading"><div><div class="eyebrow">Candidates</div><h2>Meet the people running.</h2></div></div><div class="candidate-grid">${(cfg.election?.candidates || []).map(candidateCard).join('')}</div>`);
   }
 
   function applyPage() {
     const p = pageById.apply || {};
     const form = cfg.googleForms?.enabled ? cfg.googleForms.apply : null;
     const ready = form?.embedUrl && !form.embedUrl.includes('YOUR_');
-    return shell('apply', `<div class="apply-layout"><div class="apply-copy"><h1>${esc(p.title || 'Bring an idea. Make an impact.')}</h1><p class="lede">${esc(p.body || '')}</p><div class="apply-points"><div><span>${icon('sparkle', 16)}</span><b>No experience required.</b><small>Bring curiosity and a willingness to help.</small></div><div><span>${icon('arrow-right', 16)}</span><b>Tell us what matters.</b><small>We want your ideas, perspective, and energy.</small></div></div></div>${ready ? `<div class="google-embed-card apply-form"><div class="embed-heading"><div><span class="eyebrow">Application</span><h3>Join Student Council</h3></div></div><iframe title="Student Council Application" src="${esc(form.embedUrl)}" loading="lazy"></iframe></div>` : `<div class="notice-card"><div class="notice-icon">${icon('arrow-up-right', 18)}</div><div><b>Application form</b><p>Connect the official Google Form in <code>config.js</code> to show it here.</p>${form?.formUrl ? `<a class="btn btn-primary btn-small" href="${esc(form.formUrl)}" target="_blank" rel="noopener">Open application ${icon('arrow-up-right', 14)}</a>` : ''}</div></div>`}</div>`);
+    return shell('apply', `<div class="apply-layout"><div class="apply-copy"><h1>${esc(p.title || 'Bring an idea. Make an impact.')}</h1><p class="lede">${esc(p.body || '')}</p><div class="apply-points"><div><span>${icon('sparkle', 16)}</span><b>No experience required.</b><small>Bring curiosity and a willingness to help.</small></div><div><span>${icon('arrow-right', 16)}</span><b>Tell us what matters.</b><small>We want your ideas, perspective, and energy.</small></div></div></div>${ready ? `<div class="google-embed-card apply-form"><div class="embed-heading"><div><span class="eyebrow">Application</span><h3>Join Student Council</h3></div></div><iframe title="Student Council Application" src="${esc(form.embedUrl)}" loading="lazy"></iframe></div>` : `<div class="notice-card"><div class="notice-icon">${icon('arrow-up-right', 18)}</div><div><b>Application form</b><p>Connect the official Google Form in <code>config.js</code> to show it here.</p>${form?.formUrl && !form.formUrl.includes('YOUR_') ? `<a class="btn btn-primary btn-small" href="${esc(form.formUrl)}" target="_blank" rel="noopener">Open application ${icon('arrow-up-right', 14)}</a>` : ''}</div></div>`}</div>`);
   }
 
   function eventsPage() {
@@ -131,15 +158,14 @@
 
   function render(route = routeFor()) {
     if (!route) {
-      if (!is404Shell && normalize(window.location.pathname) !== '/') {
-        app.innerHTML = notFoundPage();
-      } else {
-        app.innerHTML = notFoundPage();
-      }
       document.title = `404 · ${cfg.schoolName || 'Bayside Academy'}`;
+      if (nav) nav.innerHTML = '';
+      if (footerLinks) footerLinks.innerHTML = '';
+      app.innerHTML = notFoundPage();
       bindRoutes();
       return;
     }
+
     const renderer = renderers[route.page] || homePage;
     document.title = `${route.label} · ${cfg.schoolName || 'Bayside Academy'}`;
     if (nav) nav.innerHTML = routes.filter(r => r.nav).map(r => `<a href="${href(r.path)}" data-route="${esc(r.path)}" class="${normalize(r.path) === normalize(route.path) ? 'active' : ''}">${esc(r.label)}</a>`).join('');
@@ -150,57 +176,58 @@
     app.focus({ preventScroll: true });
   }
 
+  function navigate(path, replace = false) {
+    const route = routeFor(path);
+    const target = normalize(path);
+    const method = replace ? 'replaceState' : 'pushState';
+    history[method]({ route: route?.anchor || null }, '', route ? href(route.path) : href(target));
+    render(route);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function bindRoutes() {
     document.querySelectorAll('[data-route]').forEach(link => {
       link.addEventListener('click', event => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
         const target = normalize(link.getAttribute('data-route'));
         const route = routeFor(target);
         if (!route) return;
         event.preventDefault();
         navigate(route.path);
+        mobileMenu?.classList.remove('open');
+        nav?.classList.remove('open');
+        mobileMenu?.setAttribute('aria-expanded', 'false');
       });
     });
   }
 
-  function navigate(path, replace = false) {
-    const route = routeFor(path);
-    if (!route) return;
-    const target = href(route.path);
-    if (normalize(window.location.pathname) === normalize(target)) { render(route); return; }
-    history[replace ? 'replaceState' : 'pushState']({ route: route.page }, '', target);
-    render(route);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.querySelector('.main-nav')?.classList.remove('open');
-    document.getElementById('mobileMenu')?.setAttribute('aria-expanded', 'false');
-  }
-
   function bindDynamicUI() {
-    const menu = document.getElementById('mobileMenu');
-    const nav = document.getElementById('mainNav');
-    menu?.addEventListener('click', () => { const open = nav?.classList.toggle('open'); menu.setAttribute('aria-expanded', String(Boolean(open))); });
-    document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
-    updateThemeButton();
-    document.querySelectorAll('.faq-list details').forEach(detail => detail.addEventListener('toggle', () => detail.open && detail.parentElement?.querySelectorAll('details[open]').forEach(other => { if (other !== detail) other.removeAttribute('open'); })));
+    document.querySelectorAll('.faq-list details').forEach(details => {
+      details.addEventListener('toggle', () => {
+        const summary = details.querySelector('summary span');
+        if (summary) summary.textContent = details.open ? '−' : '+';
+      });
+    });
   }
 
-  function theme() { return localStorage.getItem('basc-theme') || 'dark'; }
-  function applyTheme(value) { document.documentElement.dataset.theme = value; localStorage.setItem('basc-theme', value); }
-  function toggleTheme() { applyTheme(theme() === 'dark' ? 'light' : 'dark'); updateThemeButton(); }
-  function updateThemeButton() { const button = document.getElementById('themeToggle'); if (button) { button.innerHTML = icon(theme() === 'dark' ? 'sun' : 'moon', 17); button.setAttribute('aria-label', theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'); } }
-
-  if (!is404Shell) {
-    document.getElementById('year')?.replaceChildren(String(new Date().getFullYear()));
-    setupBranding();
-    applyTheme(theme());
+  function setupMobileMenu() {
+    mobileMenu?.addEventListener('click', () => {
+      const open = nav?.classList.toggle('open');
+      mobileMenu.classList.toggle('open', Boolean(open));
+      mobileMenu.setAttribute('aria-expanded', String(Boolean(open)));
+    });
   }
-  const swURL = new URL('./sw.js', document.baseURI);
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register(swURL).catch(() => {});
 
-  let initial = routeFor();
-  if (!initial && aliases[normalize(window.location.pathname)]) {
-    initial = routeFor(aliases[normalize(window.location.pathname)]);
-    if (initial) history.replaceState({ route: initial.page }, '', href(initial.path));
+  function setupServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
-  render(initial);
+
+  setupBranding();
+  setupTheme();
+  if (year) year.textContent = new Date().getFullYear();
+  setupMobileMenu();
+  setupServiceWorker();
   window.addEventListener('popstate', () => render(routeFor()));
+  render();
 })();
