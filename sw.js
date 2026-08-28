@@ -1,43 +1,86 @@
 importScripts('./site-map.js');
 
-const VERSION = 'basc-v2';
+const VERSION = 'basc-v2.1';
 const SHELL = ['./', './index.html', './styles.css', './app.js', './config.js', './site-map.js', './404.html'];
-const known = new Set(Object.values(BASC_SITE_MAP).filter(Boolean).concat(Object.keys(BASC_SITE_MAP.aliases || {})));
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches.open(VERSION)
+      .then(cache => cache.addAll(SHELL))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(key => key !== VERSION).map(key => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
 });
 
 function pathOf(url) {
-  const path = new URL(url).pathname.replace(/\/+$/, '') || '/';
-  return path;
+  return new URL(url).pathname.replace(/\/+$/, '') || '/';
 }
 
-function sameOrigin(url) { return new URL(url).origin === self.location.origin; }
+function sameOrigin(url) {
+  return new URL(url).origin === self.location.origin;
+}
+
+function isKnownPath(path) {
+  const routes = Array.isArray(self.BASC_SITE_MAP?.routes) ? self.BASC_SITE_MAP.routes : [];
+  const aliases = self.BASC_SITE_MAP?.aliases || {};
+  const canonical = aliases[path] || path;
+  return routes.includes(path) || routes.includes(canonical) || path === self.BASC_SITE_MAP?.home;
+}
+
+async function navigationResponse(url) {
+  const path = pathOf(url);
+  const known = isKnownPath(path);
+  const shellUrl = known ? './index.html' : './404.html';
+  const fallback = await caches.match(shellUrl);
+
+  try {
+    const response = await fetch(shellUrl, { cache: 'no-store' });
+    if (!response.ok) return fallback || Response.error();
+
+    // Clone BEFORE the body is consumed/returned so the cache can safely use it.
+    const cacheCopy = response.clone();
+    eventCache(shellUrl, cacheCopy);
+
+    if (!known) {
+      return new Response(await response.blob(), {
+        status: 404,
+        statusText: 'Not Found',
+        headers: response.headers
+      });
+    }
+    return response;
+  } catch {
+    if (fallback) {
+      if (!known) {
+        return new Response(await fallback.clone().blob(), {
+          status: 404,
+          statusText: 'Not Found',
+          headers: fallback.headers
+        });
+      }
+      return fallback;
+    }
+    return Response.error();
+  }
+}
+
+function eventCache(url, response) {
+  caches.open(VERSION).then(cache => cache.put(url, response)).catch(() => {});
+}
 
 self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET' || !sameOrigin(request.url)) return;
 
-  const url = new URL(request.url);
   if (request.mode === 'navigate') {
-    event.respondWith((async () => {
-      const path = pathOf(url);
-      const canonical = BASC_SITE_MAP.aliases?.[path] || path;
-      if (known.has(path) || known.has(canonical)) {
-        const cached = await caches.match('./index.html');
-        try { return await fetch('./index.html', { cache: 'no-store' }); } catch { return cached || Response.error(); }
-      }
-      const notFound = await caches.match('./404.html');
-      try {
-        const response = await fetch('./404.html', { cache: 'no-store' });
-        return new Response(response.body, { status: 404, statusText: 'Not Found', headers: response.headers });
-      } catch { return notFound || Response.error(); }
-    })());
+    event.respondWith(navigationResponse(request.url));
     return;
   }
 
@@ -45,8 +88,14 @@ self.addEventListener('fetch', event => {
     const cached = await caches.match(request);
     try {
       const fresh = await fetch(request);
-      if (fresh.ok) caches.open(VERSION).then(cache => cache.put(request, fresh.clone()));
+      if (fresh.ok) {
+        // Clone immediately; fetch responses have a one-shot body.
+        const cacheCopy = fresh.clone();
+        eventCache(request, cacheCopy);
+      }
       return fresh;
-    } catch { return cached || Response.error(); }
+    } catch {
+      return cached || Response.error();
+    }
   })());
 });
