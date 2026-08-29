@@ -14,27 +14,30 @@ window.SITE_CONFIG = {
   branding: { logo: './assets/favicon.ico', logoAlt: 'Bayside Academy logo', fallbackMark: 'BA' },
 
   banner: {
-    enabled: false,
+    enabled: true,
     tone: 'default',
-    eyebrow: 'Announcement',
-    title: 'Welcome back!',
-    message: 'Student Council has a few things to share.',
+    eyebrow: 'Commit 4600aa5',
+    title: 'Demo @ Commit 4600aa5',
+    message: `Welcome to the Bayside Academy's demo Student Council site!`,
     dismissible: true,
     actions: [
       { label: 'Learn more', href: '/events', style: 'primary' }
     ],
     expandable: {
       enabled: true,
-      label: 'More info',
-      eyebrow: 'Announcement',
-      title: 'A bigger announcement can live here.',
-      body: 'The compact banner can open into a focused announcement without taking visitors away from the page they are reading.',
+      label: 'About This Commit',
+      eyebrow: 'c: 4600aa5',
+      title: 'What can this do?',
+      body: 'This site can hold a bunch. Voting, applications, events, and even more, all on one really niche site. Let that sink for 20 seconds.',
       sections: [
-        { title: 'Details', body: 'Add as many sections as you need.' },
-        { title: 'What to do', body: 'Use buttons below for forms, pages, external resources, or anything else.' }
+        { title: 'Pages', body: 'This site consists of a bunch of pages, these are the main ones:', items: [`Home- Mainly just a dashboard`], [`Voting- A place to vote!`], [`Apply- A place to apply`], [`Terms- all those fancy rules with the fancy words... do you understand any of them? bet you do.`], [`Events- currently everything there is fake, but I find it to be useful later on.`], [`About- everything about the council!`] },
+        { title: 'Terms', body: 'By using this site, you agree to the terms. Read them later.' },
+        { title: `Candidates`, body: `As more candidates apply, you'll start seeing them in the vote section. Or just on the home page. Your pick.`},
+        { title: `the end!`, body: `the end. i already said it. bye bye.`}
       ],
       actions: [
-        { label: 'Open events', href: '/events', style: 'primary' }
+        { label: 'Terms & Conditions', href: '/terms', style: 'primary' },
+        { label: `Home`, href: `/home`, style: `primary`}
       ]
     }
   },
