@@ -1,7 +1,7 @@
 importScripts('./site-map.js');
 
-const VERSION = 'basc-v2.4.1-features';
-const SHELL = ['./','./index.html','./styles.css','./content-pages.css','./banner.css','./candidate-hero.css','./ui-fixes.css','./app.js','./config.js','./site-map.js','./banner.js','./search.js','./site-bot.js','./footer.js','./404.html'];
+const VERSION = 'basc-v2.4.2-basi-config';
+const SHELL = ['./','./index.html','./styles.css','./content-pages.css','./banner.css','./candidate-hero.css','./ui-fixes.css','./app.js','./config.js','./bot-config.js','./site-map.js','./banner.js','./search.js','./site-bot.js','./footer.js','./404.html'];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())));
