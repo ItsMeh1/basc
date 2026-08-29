@@ -16,21 +16,21 @@ window.SITE_CONFIG = {
   banner: {
     enabled: true,
     tone: 'default',
-    eyebrow: 'Commit 4600aa5',
-    title: 'Demo @ Commit 4600aa5',
-    message: `Welcome to the Bayside Academy's demo Student Council site!`,
-    dismissible: true,
+    eyebrow: '00af35d',
+    title: 'READ ME, NOW! New update, terms, and candidates!',
+    message: `New Update, 00af35d Changelog`,
+    dismissible: false,
     actions: [
-      { label: 'Learn more', href: '/events', style: 'primary' }
+      // { label: 'Learn more', href: '/events', style: 'primary' }
     ],
     expandable: {
       enabled: true,
-      label: 'About This Commit',
-      eyebrow: 'c: 4600aa5',
-      title: 'What can this do?',
-      body: 'This site can hold a bunch. Voting, applications, events, and even more, all on one really niche site. Let that sink for 20 seconds.',
+      label: 'About 00af35d',
+      eyebrow: 'new update!',
+      title: 'Whats New?',
+      body: 'Lots of new stuff in this one update. Check it out!',
       sections: [
-        { title: 'Pages', body: 'This site consists of a bunch of pages, these are the main ones:', items: [
+        { title: 'Updated Pages', body: 'Updates to all the main pages, being these:', items: [
             'Home - Mainly just a dashboard',
             'Voting - A place to vote!',
             'Apply - A place to apply',
@@ -38,9 +38,12 @@ window.SITE_CONFIG = {
             'Events - Currently everything there is fake, but I find it to be useful later on.',
             'About - Everything about the council!'
           ] },
-        { title: 'Terms', body: 'By using this site, you agree to the terms. Read them later.' },
-        { title: `Candidates`, body: `As more candidates apply, you'll start seeing them in the vote section. Or just on the home page. Your pick.`},
-        { title: `the end!`, body: `the end. i already said it. bye bye.`}
+        { title: 'Terms', body: 'Terms have been updated! By using this site, you acknowledge you have read the terms and abide by them. If you did not read them, go do it NOW.' },
+        { title: `Candidates`, body: `Are you wanting to apply? Read the Terms to understand all of the guidelines, and hit that apply button to apply! For both buttons, scroll down! As more candidates apply, you'll start seeing them in the vote section. Or just on the home page. Your pick. However, the vote section does have every single applied candidate. Just saying. No stress. I'll stop here I'm getting carried away.`},
+        { title: `Voting & Applying`, body: `You have two choices: Either apply on this website (way easier) or open it in a new tab via the provided button on the page. You won't be able to vote yet, but you can apply right now for the council. Scroll down & click the apply button! Be sure to read the terms as well.`},
+        { title: `Events`, body: `With the start of the Student Council, there will be a CRAZY amount of actually somewhat fun events. Use the events page to save it all! You'll be the first one to know, this is for the best.` },
+        { title: `Voting`, body: `As said above, be sure to check the events page to know when the voting is open & applications are closed. PLEASE don't miss the deadlines!`},
+        { title: `Commit 00af35d`, body: `Commit 00af35d brings lots of new changes to BASC (news flash, this is the original name of this page....).`, items: [`New banner with automatic refreshing, so you don't need to refresh your page for the latest data. Refetches every 15 seconds so you won't miss anything`, `New Registered SW for routing & 404s`, `TLS Certificate & HTTPS Encryption for secure data!`, `Fixed a bug where the events page would always return a 404 for whatever reason`, `Fixed a bug where some buttons would successfully redirect and others wouldn't altho they have the same target.....`, `Fixed a bug where some redirects on certain elements wouldn't want to work just because....`]}
       ],
       actions: [
         { label: 'Terms & Conditions', href: '/terms', style: 'primary' },
@@ -101,7 +104,7 @@ window.SITE_CONFIG = {
   ],
   committees: [
     { title: 'Student Life', body: 'Improve campus culture, spirit, inclusion, and the everyday student experience.', icon: '✦' },
-    { title: 'Events', body: 'Plan assemblies, fundraisers, and the moments students remember.', icon: '◫' },
+    { title: 'Events', body: 'Plan assemblies, fundraisers, and the moments students remember.', icon: '🗓️' },
     { title: 'Advocacy', body: 'Bring student feedback to administration and turn concerns into useful proposals.', icon: '↗' }
   ],
   application: { title: 'Apply to Student Council', intro: 'Tell us what you care about and where you would like to help.' },
