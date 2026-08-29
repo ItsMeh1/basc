@@ -39,11 +39,11 @@ window.SITE_CONFIG = {
       body: 'A simple guide to using the Bayside Academy Student Council website.',
       updated: 'Last updated · August 28, 2026', showContents: true,
       sections: [
-        { title: 'Using this site', body: 'This website is provided for student council information, applications, elections, events, and related school communications. Please use it respectfully and only for its intended purposes.', emphasis: 'accent' },
-        { title: 'What you can expect', body: 'We aim to keep the site useful, clear, and current. Some information can change as school plans change.', items: ['Current election and candidate information when available.', 'Event information intended to help students participate.', 'Links to official forms and school resources.'] },
+        { title: 'Using this site', body: `This website is provided for Bayside Academy's student council information, applications, elections, events, and related school communications. Please use it respectfully and only for its intended purposes. The site aims to be useful, clear, and up-to-date. However, any date, timing, etc may be changed without notice. Some of the events covered on here will be the following:`, items: ['Current election and candidate information when available.', 'Student council voting & applications', 'Links to forms and school resources'] emphasis: 'accent' },
         { title: 'Accuracy & official information', body: 'We work to keep information accurate, but schedules, forms, candidates, and other details can change. Official school communications take priority when there is a conflict.', note: 'If something on this site disagrees with an official school announcement, follow the official announcement.' },
-        { title: 'External services', body: 'Some features may use third-party services such as Google Forms. Those services may have their own terms, privacy practices, and availability.', emphasis: 'note' },
-        { title: 'User submissions', body: 'When you submit information through an official form, provide accurate information and do not submit content that is unlawful, harmful, abusive, or intended to disrupt the service.' },
+        { title: 'External services', body: 'Some features may use third-party services. We are not responsible for third-parites and they have their own terms that you must follow by.', emphasis: 'note' },
+        { title: 'User submissions', body: 'When you submit information through an official form, provide accurate information, and do not submit content that is', items: [`unlawful`], [`harmful`], [`abusive`], [`harrasing`], [`intented to disrupt`] },
+        { title: `Elections`, body: `Yearly, the student council holds elections to decide who will be on the council. All candidates are expected to maintain a high standard of behavior and serve as positive role models for the student body. During elections, any of these actions are prohibited and will result in consequences up to the school's administrative team, plus removal from the election:`, items: [`Bribing others with money, candy, stickers, or any other item`], [`Teaming against candidates`], [`Pulling down, removing, griefing, or sabatoging anyone elses posters or any other election items`], [`Convincing anyone to vote for you`], [`Convincing someone that has a vote to change theirs`], [`Handing out any political literature, including but not limited to flyers, posters, and banners if your not a candidate`], [`Wearing political apparel, if any`], [`Tampering with election forms in any way`], [`Using proxies, bots, or other services to vote multiple times`], [`Hyper-competitivity during elections`]  [`Any harrasment or threats related to the elections, even before, during, or after the elections`] },
         { title: 'Changes to these terms', body: 'These terms may be updated when the site or its services change. The current version will always be posted on this page.' }
       ]
     }
@@ -72,7 +72,7 @@ window.SITE_CONFIG = {
   faq: [
     ['How do I vote?', 'Open the Vote page, review the candidates, and complete the official ballot.'],
     ['How do I apply?', 'Open Apply and use the official application form.'],
-    ['What positions are there?', 'Available positions are listed in the official application and election materials.'],
-    ['What does council do?', 'Council organizes student activities, represents student feedback, and works on projects that improve campus life.']
+    ['What positions are there?', 'Available positions are listed in the application form.'],
+    ['What does council do?', 'Council organizes student activities, represents student feedback, and works on projects that improve campus life. We manage most fun stuff at school.']
   ]
 };
