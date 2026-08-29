@@ -1,0 +1,15 @@
+/* One definitive style for the home candidate showcase. */
+.hero-candidates-wrap{width:100%;margin:22px 0 2px}
+.hero-candidate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+.hero-candidate-card{display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:center;gap:11px;min-width:0;min-height:70px;padding:11px 12px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.035);transition:transform .18s ease,background .18s ease,border-color .18s ease}
+.hero-candidate-card:hover{transform:translateY(-2px);background:var(--surface-strong);border-color:rgba(244,214,94,.24)}
+.hero-candidate-avatar{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--yellow-soft);color:var(--yellow);font-size:11px;font-weight:800}
+.hero-candidate-info{min-width:0;display:grid;gap:3px}
+.hero-candidate-info strong{font-family:'Space Grotesk';font-size:13px;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hero-candidate-info span{font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hero-candidate-number{font-size:9px;color:var(--faint);font-weight:800}
+/* The outer hero card grows with these rows naturally: no fixed height, no scrolling, no squashing. */
+.hero-candidates-wrap.count-1 .hero-candidate-grid,.hero-candidates-wrap.count-2 .hero-candidate-grid{grid-template-columns:1fr}
+.hero-candidates-wrap.count-3 .hero-candidate-grid,.hero-candidates-wrap.count-4 .hero-candidate-grid,.hero-candidates-wrap.count-5 .hero-candidate-grid,.hero-candidates-wrap.count-6 .hero-candidate-grid,.hero-candidates-wrap.count-7 .hero-candidate-grid,.hero-candidates-wrap.count-8 .hero-candidate-grid,.hero-candidates-wrap.count-9 .hero-candidate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:850px){.hero-candidate-grid{grid-template-columns:1fr!important}}
+@media(max-width:560px){.hero-candidate-card{min-height:68px;padding:10px}.hero-candidate-avatar{width:42px;height:42px}}
