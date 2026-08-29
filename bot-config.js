@@ -32,6 +32,8 @@ window.BASI_CONFIG = {
     { selector: '.events-preview', title: 'Events', text: 'This is where upcoming campus events are surfaced.' },
     { selector: '#liveBanner', title: 'Live announcements', text: 'Banners can change while you are on the site, and Basi can use their information too.' },
     { selector: '.site-footer', title: 'Every page', text: 'The footer gives you a complete list of the site pages.' },
-    { selector: '.basi-button', title: 'Your little guide', text: 'And this is me! Ask me questions or teach me new things in this file.' }
+    { selector: '.basi-button', title: 'Your little guide', text: 'Ask me questions or teach me new things in this file.' }
   ]
 };
+window.SITE_CONFIG = window.SITE_CONFIG || {};
+window.SITE_CONFIG.bot = window.BASI_CONFIG;
