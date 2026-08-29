@@ -1,11 +1,13 @@
 /*
  * CONTENT + ROUTES
  *
- * To add a new informational page, you only need:
- *   1. Add one object inside `pages`, e.g. `terms: { ... }`.
- *   2. Add one route inside `routes`, e.g. `{ path: '/terms', label: 'Terms', page: 'content', content: 'terms' }`.
+ * New informational page:
+ *   1. Add a page object inside `pages`.
+ *   2. Add one route with `page: 'content'` and `content: 'yourPageId'`.
  *
- * No HTML needs to be written in app.js.
+ * Content pages support: eyebrow, title, body, updated, showContents,
+ * and sections with title, body, items, note, and emphasis ('note'|'accent').
+ * No HTML is needed.
  */
 window.SITE_CONFIG = {
   schoolName: 'Bayside Academy',
@@ -33,17 +35,16 @@ window.SITE_CONFIG = {
     about: { eyebrow: 'About council', title: 'A student voice with a real seat at the table.', body: 'Student Council connects student ideas with real school decisions through events, advocacy, and student-led projects.' },
     faq: { eyebrow: 'Help', title: 'Frequently asked questions.' },
     terms: {
-      type: 'content',
-      eyebrow: 'Legal',
-      title: 'Terms & Conditions',
-      body: 'These terms explain the basic rules for using the Bayside Academy Student Council website.',
-      updated: 'Last updated: August 28, 2026',
+      type: 'content', eyebrow: 'Legal', title: 'Terms & Conditions',
+      body: 'A simple guide to using the Bayside Academy Student Council website.',
+      updated: 'Last updated · August 28, 2026', showContents: true,
       sections: [
-        { title: 'Using this site', body: 'This website is provided for student council information, applications, elections, events, and related school communications. Use it respectfully and only for its intended purposes.' },
-        { title: 'Accuracy', body: 'We work to keep information current, but schedules, forms, candidates, and other details can change. Official school communications take priority when there is a conflict.' },
-        { title: 'External services', body: 'Some features may use third-party services such as Google Forms. Those services may have their own terms, privacy practices, and availability.' },
-        { title: 'User submissions', body: 'When you submit information through an official form, provide accurate information and do not submit content that is unlawful, harmful, or intended to disrupt the service.' },
-        { title: 'Changes', body: 'These terms may be updated when the site or its services change. The current version will be posted on this page.' }
+        { title: 'Using this site', body: 'This website is provided for student council information, applications, elections, events, and related school communications. Please use it respectfully and only for its intended purposes.', emphasis: 'accent' },
+        { title: 'What you can expect', body: 'We aim to keep the site useful, clear, and current. Some information can change as school plans change.', items: ['Current election and candidate information when available.', 'Event information intended to help students participate.', 'Links to official forms and school resources.'] },
+        { title: 'Accuracy & official information', body: 'We work to keep information accurate, but schedules, forms, candidates, and other details can change. Official school communications take priority when there is a conflict.', note: 'If something on this site disagrees with an official school announcement, follow the official announcement.' },
+        { title: 'External services', body: 'Some features may use third-party services such as Google Forms. Those services may have their own terms, privacy practices, and availability.', emphasis: 'note' },
+        { title: 'User submissions', body: 'When you submit information through an official form, provide accurate information and do not submit content that is unlawful, harmful, abusive, or intended to disrupt the service.' },
+        { title: 'Changes to these terms', body: 'These terms may be updated when the site or its services change. The current version will always be posted on this page.' }
       ]
     }
   },
