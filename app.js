@@ -21,48 +21,58 @@
     const clean = String(path || '/').split('?')[0].split('#')[0].replace(/\/+/g, '/');
     return clean.length > 1 ? clean.replace(/\/$/, '') : '/';
   }
-
   function routeFor(path = location.pathname) {
     const clean = normalize(path);
     return routeByPath.get(aliases[clean] || clean) || null;
   }
-
   function esc(value) {
     return String(value ?? '').replace(/[&<>'"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c]));
   }
-
   function icon(name, size = 17) {
     const paths = {
-      'arrow-up-right': '<path d="M7 17 17 7M8 7h9v9"/>',
-      'arrow-right': '<path d="M5 12h13M13 6l6 6-6 6"/>',
-      sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
-      moon: '<path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/>',
-      check: '<path d="m5 12 4 4L19 6"/>',
-      sparkle: '<path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z"/>'
+      'arrow-up-right':'<path d="M7 17 17 7M8 7h9v9"/>',
+      'arrow-right':'<path d="M5 12h13M13 6l6 6-6 6"/>',
+      sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+      moon:'<path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/>',
+      menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+      close:'<path d="m6 6 12 12M18 6 6 18"/>',
+      check:'<path d="m5 12 4 4L19 6"/>',
+      sparkle:'<path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z"/>'
     };
     return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ''}</svg>`;
+  }
+  function hydrateIcons() {
+    document.querySelectorAll('[data-icon]').forEach(el => el.innerHTML = icon(el.dataset.icon, el.dataset.icon === 'menu' || el.dataset.icon === 'close' ? 18 : 16));
   }
 
   function setupBranding() {
     document.querySelectorAll('[data-school-name]').forEach(e => e.textContent = cfg.schoolName || 'Bayside Academy');
     document.querySelectorAll('[data-school-tagline]').forEach(e => e.textContent = cfg.tagline || 'Student Council');
     document.querySelectorAll('[data-brand-fallback]').forEach(e => e.textContent = cfg.branding?.fallbackMark || 'BA');
-    document.querySelectorAll('[data-brand-logo]').forEach(img => {
-      const fallback = img.closest('.brand-media')?.querySelector('[data-brand-fallback]');
-      img.hidden = true;
-      if (!cfg.branding?.logo) { if (fallback) fallback.hidden = false; return; }
-      img.alt = cfg.branding.logoAlt || `${cfg.schoolName || 'Bayside Academy'} logo`;
-      img.addEventListener('load', () => {
-        if (img.naturalWidth > 0) {
-          img.hidden = false;
-          if (fallback) fallback.hidden = true;
-        }
-      }, { once: true });
-      img.addEventListener('error', () => {
+    document.querySelectorAll('.brand-media').forEach(media => {
+      const img = media.querySelector('[data-brand-logo]');
+      const fallback = media.querySelector('[data-brand-fallback]');
+      if (!img) return;
+      const showFallback = () => {
+        media.dataset.logoState = 'fallback';
         img.hidden = true;
-        if (fallback) fallback.hidden = false;
-      }, { once: true });
+        img.style.display = 'none';
+        if (fallback) { fallback.hidden = false; fallback.style.display = 'grid'; }
+      };
+      const showLogo = () => {
+        if (!img.naturalWidth) return showFallback();
+        media.dataset.logoState = 'ready';
+        if (fallback) { fallback.hidden = true; fallback.style.display = 'none'; }
+        img.hidden = false;
+        img.style.display = 'block';
+      };
+      showFallback();
+      if (!cfg.branding?.logo) return;
+      img.alt = cfg.branding.logoAlt || `${cfg.schoolName || 'Bayside Academy'} logo`;
+      img.onload = showLogo;
+      img.onerror = showFallback;
       img.src = cfg.branding.logo;
+      if (img.complete) img.naturalWidth ? showLogo() : showFallback();
     });
   }
 
@@ -79,7 +89,6 @@
       updateThemeButton(next);
     });
   }
-
   function updateThemeButton(theme) {
     if (!themeToggle) return;
     const dark = theme === 'dark';
@@ -87,23 +96,19 @@
     themeToggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
     themeToggle.title = dark ? 'Light mode' : 'Dark mode';
   }
-
   function routeLink(path, label, cls = '') {
     const route = routeFor(path);
     const target = route ? route.path : path;
     return `<a class="${cls}" href="${esc(target)}" data-route="${esc(target)}">${label}</a>`;
   }
-
   function shell(page, content) {
     const p = pages[page] || {};
     return `<section class="page-shell section-pad" data-page="${esc(page)}"><div class="page-kicker"><span class="eyebrow">${esc(p.eyebrow || '')}</span>${p.meta ? `<span class="deadline">${esc(p.meta)}</span>` : ''}</div>${content}</section>`;
   }
-
   function eventCard(e, large = false) {
     const [month, day] = String(e.date || '').split(/\s+/);
     return `<article class="event-card ${large ? 'event-card-large' : ''}"><div class="event-date"><span>${esc(month)}</span><strong>${esc(day)}</strong></div><div class="event-content"><span class="event-tag">${esc(e.tag)}</span><h3>${esc(e.title)}</h3><p>${esc(e.time)} <i>·</i> ${esc(e.place)}</p></div><span class="event-arrow">${icon('arrow-up-right',16)}</span></article>`;
   }
-
   function candidateCard(c) {
     const initials = String(c.name || '').split(/\s+/).map(x => x[0]).join('').slice(0,2).toUpperCase();
     return `<article class="candidate-card"><div class="candidate-top"><span class="avatar">${esc(initials)}</span><span class="candidate-grade">${esc(c.grade)}</span></div><h3>${esc(c.name)}</h3><div class="candidate-role">${esc(c.role)}</div><p>“${esc(c.statement)}”</p></article>`;
@@ -117,45 +122,41 @@
     const events = (cfg.events || []).slice(0,3).map(eventCard).join('');
     return `<section class="hero section-pad"><div class="hero-copy"><div class="eyebrow">${esc(p.eyebrow)}</div><h1>${esc(p.title)}</h1><p>${esc(p.body)}</p><div class="button-row">${routeLink('/vote','Vote in the election','btn btn-primary')}${routeLink('/apply','Get involved','btn btn-secondary')}</div><div class="hero-note"><span class="status-dot"></span><span>Student Council · 2026–27</span></div></div><div class="hero-visual"><div class="hero-card glass-card"><div class="card-top"><span>2026–27 election</span><span class="live-pill"><i></i> Open</span></div><div class="hero-card-title">Choose your next<br><em>student leaders.</em></div><div class="candidate-stack">${(cfg.election?.candidates || []).slice(0,3).map(c => `<div class="candidate-chip"><span class="avatar small">${esc(String(c.name).split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase())}</span><span><b>${esc(c.name)}</b><small>${esc(c.role)}</small></span>${icon('arrow-up-right',15)}</div>`).join('')}</div>${routeLink('/vote','View candidates','card-link')}</div><div class="floating-badge"><span>${icon('sparkle',14)}</span><b>Student-led</b><small>Ideas → action</small></div></div></section><section class="stats section-pad">${stats}</section><section class="section-pad section-intro"><div><div class="eyebrow">What we do</div><h2>Student-led,<br>school-wide.</h2></div><p>Student Council is a place to turn good ideas into real campus experiences — from events and community building to advocacy and everyday improvements.</p></section><section class="grid-3 section-pad">${committees}</section><section class="section-pad spotlight"><div class="section-heading"><div><div class="eyebrow">Meet the candidates</div><h2>Your voice matters.</h2></div>${routeLink('/vote','See all candidates','text-link')}</div><div class="candidate-grid">${candidates}</div></section><section class="section-pad events-preview"><div class="section-heading"><div><div class="eyebrow">Coming up</div><h2>Don't miss these.</h2></div>${routeLink('/events','See all events','text-link')}</div><div class="event-grid">${events}</div></section>`;
   }
-
   function votePage() {
     const p = pages.vote || {}, form = cfg.googleForms?.enabled ? cfg.googleForms.vote : null;
     const ready = form?.embedUrl && !form.embedUrl.includes('YOUR_');
     return shell('vote', `<h1>${esc(p.title || 'Cast your vote.')}</h1><p class="lede">${esc(p.body || '')}</p>${ready ? `<div class="google-embed-card"><div class="embed-heading"><div><span class="eyebrow">Official ballot</span><h3>Student Council Election</h3></div><span class="secure-badge">School form</span></div><iframe title="Official Student Council Ballot" src="${esc(form.embedUrl)}" loading="lazy"></iframe></div>` : `<div class="notice-card"><div class="notice-icon">${icon('check',18)}</div><div><b>Ballot connection is ready to configure.</b><p>Add the real Google Forms URL in <code>config.js</code> when the ballot is published.</p></div></div>`}<div class="section-heading inner-heading"><div><div class="eyebrow">Candidates</div><h2>Meet the people running.</h2></div></div><div class="candidate-grid">${(cfg.election?.candidates || []).map(candidateCard).join('')}</div>`);
   }
-
   function applyPage() {
     const p = pages.apply || {}, form = cfg.googleForms?.enabled ? cfg.googleForms.apply : null;
     const ready = form?.embedUrl && !form.embedUrl.includes('YOUR_');
     return shell('apply', `<div class="apply-layout"><div class="apply-copy"><h1>${esc(p.title || 'Bring an idea. Make an impact.')}</h1><p class="lede">${esc(p.body || '')}</p><div class="apply-points"><div><span>${icon('sparkle',16)}</span><b>No experience required.</b><small>Bring curiosity and a willingness to help.</small></div><div><span>${icon('arrow-right',16)}</span><b>Tell us what matters.</b><small>We want your ideas, perspective, and energy.</small></div></div></div>${ready ? `<div class="google-embed-card apply-form"><div class="embed-heading"><div><span class="eyebrow">Application</span><h3>Join Student Council</h3></div></div><iframe title="Student Council Application" src="${esc(form.embedUrl)}" loading="lazy"></iframe></div>` : `<div class="notice-card"><div class="notice-icon">${icon('arrow-up-right',18)}</div><div><b>Application form</b><p>Connect the official Google Form in <code>config.js</code> to show it here.</p></div></div>`}</div>`);
   }
-
   function eventsPage() {
     const p = pages.events || {};
     return shell('events', `<h1>${esc(p.title || "What's happening on campus.")}</h1><p class="lede">${esc(p.body || '')}</p><div class="event-list">${(cfg.events || []).map(e => eventCard(e,true)).join('')}</div>`);
   }
-
   function aboutPage() {
     const p = pages.about || {};
     return shell('about', `<h1>${esc(p.title || 'About Student Council')}</h1><p class="lede">${esc(p.body || '')}</p><div class="about-grid">${(cfg.committees || []).map(c => `<article class="glass-card about-card"><div class="feature-icon">${esc(c.icon || '✦')}</div><h3>${esc(c.title)}</h3><p>${esc(c.body)}</p></article>`).join('')}</div><div class="quote-card"><span class="eyebrow">The goal</span><blockquote>“A good council doesn't speak for students. It makes it easier for students to speak for themselves.”</blockquote><small>— Student Council</small></div></section>`);
   }
-
   function faqPage() {
     const p = pages.faq || {};
     return shell('faq', `<h1>${esc(p.title || 'Frequently asked questions.')}</h1><div class="faq-list">${(cfg.faq || []).map(([q,a]) => `<details><summary>${esc(q)}<span>+</span></summary><p>${esc(a)}</p></details>`).join('')}</div>`);
   }
 
-  // Generic content pages. Add the page's text to config.js; no HTML or new JS renderer is needed.
   function contentPage(pageId) {
     const p = pages[pageId] || {};
     const sections = Array.isArray(p.sections) ? p.sections : [];
-    return shell(pageId, `<h1>${esc(p.title || 'Page')}</h1>${p.body ? `<p class="lede">${esc(p.body)}</p>` : ''}${p.updated ? `<p class="page-updated">${esc(p.updated)}</p>` : ''}<div class="content-sections">${sections.map(s => `<article class="glass-card content-section"><h2>${esc(s.title)}</h2><p>${esc(s.body)}</p></article>`).join('')}</div>`);
+    const intro = p.body ? `<p class="content-lede">${esc(p.body)}</p>` : '';
+    const updated = p.updated ? `<p class="page-updated">${esc(p.updated)}</p>` : '';
+    const toc = p.showContents && sections.length > 1 ? `<nav class="content-toc" aria-label="On this page"><span>On this page</span>${sections.map((s,i)=>`<a href="#content-${i}">${esc(s.title)}</a>`).join('')}</nav>` : '';
+    const body = sections.map((s,i) => `<section class="content-section ${s.emphasis ? `content-section-${esc(s.emphasis)}` : ''}" id="content-${i}"><div class="content-section-index">${String(i+1).padStart(2,'0')}</div><div><h2>${esc(s.title)}</h2>${s.body ? `<p>${esc(s.body)}</p>` : ''}${Array.isArray(s.items) ? `<ul>${s.items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>` : ''}${s.note ? `<aside class="content-note">${esc(s.note)}</aside>` : ''}</div></section>`).join('');
+    return shell(pageId, `<div class="document-page"><div class="document-header"><div><h1>${esc(p.title || 'Page')}</h1>${intro}</div>${updated}</div>${toc}<div class="document-body">${body}</div></div>`);
   }
-
   function notFoundPage() {
     return `<section class="not-found"><div class="not-found-orbit"><span>404</span></div><span class="eyebrow">Page not found</span><h1>That page took<br>a wrong turn.</h1><p>We couldn't find anything at <code>${esc(normalize(location.pathname))}</code>. The good news: the rest of the council site is still right here.</p><div class="button-row">${routeLink('/','Back to home','btn btn-primary')}${routeLink('/events','Explore events','btn btn-secondary')}</div></section>`;
   }
-
   const renderers = { home: homePage, vote: votePage, apply: applyPage, events: eventsPage, about: aboutPage, faq: faqPage, content: route => contentPage(route.content) };
 
   function render(route = routeFor()) {
@@ -165,6 +166,7 @@
       if (footerLinks) footerLinks.innerHTML = '';
       app.innerHTML = notFoundPage();
       bindRoutes();
+      hydrateIcons();
       return;
     }
     const renderer = renderers[route.page] || homePage;
@@ -174,9 +176,9 @@
     app.innerHTML = renderer(route);
     bindRoutes();
     bindDynamicUI();
+    hydrateIcons();
     app.focus({ preventScroll: true });
   }
-
   function navigate(path, replace = false) {
     const route = routeFor(path);
     const target = normalize(path);
@@ -184,7 +186,6 @@
     render(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
   function bindRoutes() {
     document.querySelectorAll('[data-route]').forEach(link => {
       link.addEventListener('click', event => {
@@ -193,30 +194,34 @@
         if (!route) return;
         event.preventDefault();
         navigate(route.path);
-        mobileMenu?.classList.remove('open');
         nav?.classList.remove('open');
-        mobileMenu?.setAttribute('aria-expanded','false');
+        if (mobileMenu) {
+          mobileMenu.classList.remove('open');
+          mobileMenu.setAttribute('aria-expanded','false');
+          mobileMenu.innerHTML = `<span data-icon="menu" aria-hidden="true"></span>`;
+          hydrateIcons();
+        }
       });
     });
   }
-
   function bindDynamicUI() {
     document.querySelectorAll('.faq-list details').forEach(d => d.addEventListener('toggle', () => {
       const s = d.querySelector('summary span');
       if (s) s.textContent = d.open ? '−' : '+';
     }));
   }
-
   mobileMenu?.addEventListener('click', () => {
     const open = nav?.classList.toggle('open');
     mobileMenu.classList.toggle('open', Boolean(open));
     mobileMenu.setAttribute('aria-expanded', String(Boolean(open)));
+    mobileMenu.innerHTML = `<span data-icon="${open ? 'close' : 'menu'}" aria-hidden="true"></span>`;
+    hydrateIcons();
   });
-
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
   window.addEventListener('popstate', () => render(routeFor()));
   if (year) year.textContent = new Date().getFullYear();
   setupBranding();
   setupTheme();
+  hydrateIcons();
   render();
 })();
