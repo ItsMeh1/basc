@@ -1,6 +1,11 @@
 /*
- * Content lives here; rendering lives in app.js.
- * Add a page by adding one entry to `pages` and one route to `routes`.
+ * CONTENT + ROUTES
+ *
+ * To add a new informational page, you only need:
+ *   1. Add one object inside `pages`, e.g. `terms: { ... }`.
+ *   2. Add one route inside `routes`, e.g. `{ path: '/terms', label: 'Terms', page: 'content', content: 'terms' }`.
+ *
+ * No HTML needs to be written in app.js.
  */
 window.SITE_CONFIG = {
   schoolName: 'Bayside Academy',
@@ -17,15 +22,30 @@ window.SITE_CONFIG = {
     { path: '/apply', label: 'Apply', nav: true, page: 'apply' },
     { path: '/events', label: 'Events', nav: true, page: 'events' },
     { path: '/about', label: 'About', nav: true, page: 'about' },
-    { path: '/faq', label: 'FAQ', nav: false, page: 'faq' }
+    { path: '/faq', label: 'FAQ', nav: false, page: 'faq' },
+    { path: '/terms', label: 'Terms & Conditions', nav: false, page: 'content', content: 'terms' }
   ],
   pages: {
     home: { eyebrow: 'Your school. Your voice.', title: 'Make campus better, one idea at a time.', body: 'Student Council is where ideas become action. Vote in elections, apply for a role, and help shape what happens on campus.' },
     vote: { eyebrow: 'Election 2026–27', title: 'Cast your vote.', body: 'Meet the candidates, then use the official school ballot to make your voice count.' },
-    apply: { eyebrow: 'Get involved', title: 'Bring an idea. Make an impact.', body: "Tell us what you care about and where you would like to help. You do not need experience to get involved." },
+    apply: { eyebrow: 'Get involved', title: 'Bring an idea. Make an impact.', body: 'Tell us what you care about and where you would like to help. You do not need experience to get involved.' },
     events: { eyebrow: 'Calendar', title: "What's happening on campus.", body: 'Meet people, join in, and show up for the parts of school you want to shape.' },
     about: { eyebrow: 'About council', title: 'A student voice with a real seat at the table.', body: 'Student Council connects student ideas with real school decisions through events, advocacy, and student-led projects.' },
-    faq: { eyebrow: 'Help', title: 'Frequently asked questions.' }
+    faq: { eyebrow: 'Help', title: 'Frequently asked questions.' },
+    terms: {
+      type: 'content',
+      eyebrow: 'Legal',
+      title: 'Terms & Conditions',
+      body: 'These terms explain the basic rules for using the Bayside Academy Student Council website.',
+      updated: 'Last updated: August 28, 2026',
+      sections: [
+        { title: 'Using this site', body: 'This website is provided for student council information, applications, elections, events, and related school communications. Use it respectfully and only for its intended purposes.' },
+        { title: 'Accuracy', body: 'We work to keep information current, but schedules, forms, candidates, and other details can change. Official school communications take priority when there is a conflict.' },
+        { title: 'External services', body: 'Some features may use third-party services such as Google Forms. Those services may have their own terms, privacy practices, and availability.' },
+        { title: 'User submissions', body: 'When you submit information through an official form, provide accurate information and do not submit content that is unlawful, harmful, or intended to disrupt the service.' },
+        { title: 'Changes', body: 'These terms may be updated when the site or its services change. The current version will be posted on this page.' }
+      ]
+    }
   },
   stats: [['Student-led', 'initiatives'], ['Open', 'student voice'], ['One', 'school community']],
   election: {
