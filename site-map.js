@@ -7,11 +7,13 @@
     events: '/events',
     about: '/about',
     faq: '/faq',
+    terms: '/terms',
     aliases: {
       '/v': '/vote',
       '/a': '/apply',
       '/e': '/events',
-      '/abt': '/about'
+      '/abt': '/about',
+      '/t': '/terms'
     }
   };
 })(typeof self !== 'undefined' ? self : window);
