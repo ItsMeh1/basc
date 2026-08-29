@@ -30,7 +30,14 @@ window.SITE_CONFIG = {
       title: 'What can this do?',
       body: 'This site can hold a bunch. Voting, applications, events, and even more, all on one really niche site. Let that sink for 20 seconds.',
       sections: [
-        { title: 'Pages', body: 'This site consists of a bunch of pages, these are the main ones:', items: [`Home- Mainly just a dashboard`], [`Voting- A place to vote!`], [`Apply- A place to apply`], [`Terms- all those fancy rules with the fancy words... do you understand any of them? bet you do.`], [`Events- currently everything there is fake, but I find it to be useful later on.`], [`About- everything about the council!`] },
+        { title: 'Pages', body: 'This site consists of a bunch of pages, these are the main ones:', items: [
+            'Home - Mainly just a dashboard',
+            'Voting - A place to vote!',
+            'Apply - A place to apply',
+            'Terms - All those fancy rules with the fancy words... do you understand any of them? Bet you do.',
+            'Events - Currently everything there is fake, but I find it to be useful later on.',
+            'About - Everything about the council!'
+          ] },
         { title: 'Terms', body: 'By using this site, you agree to the terms. Read them later.' },
         { title: `Candidates`, body: `As more candidates apply, you'll start seeing them in the vote section. Or just on the home page. Your pick.`},
         { title: `the end!`, body: `the end. i already said it. bye bye.`}
