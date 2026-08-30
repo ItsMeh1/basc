@@ -1,167 +1,28 @@
 (() => {
   'use strict';
+  const cfg=window.SITE_CONFIG||{}, bot=cfg.bot||{}, pages=cfg.pages||{};
+  const candidates=Array.isArray(cfg.election?.candidates)?cfg.election.candidates:[];
+  const events=Array.isArray(cfg.events)?cfg.events:[];
+  let expanded=false, tourRunning=false;
+  const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const norm=v=>String(v||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+  const css=document.createElement('style');css.textContent=`
+  .basi-wrap{position:fixed;right:22px;bottom:22px;z-index:115;font-family:'DM Sans',system-ui,sans-serif}.basi-button{width:58px;height:58px;border:1px solid var(--line);border-radius:20px;background:var(--yellow);color:#19180f;box-shadow:0 18px 50px rgba(0,0,0,.28);cursor:pointer;display:grid;place-items:center;transition:.2s}.basi-button:hover{transform:translateY(-4px) rotate(-3deg)}.basi-face{width:31px;height:25px;border-radius:11px;background:currentColor;position:relative}.basi-face:before{content:'•  •';position:absolute;left:6px;top:2px;font-size:10px;letter-spacing:4px;color:var(--yellow)}
+  .basi-panel{position:absolute;right:0;bottom:70px;width:min(390px,calc(100vw - 28px));height:520px;max-height:calc(100vh - 105px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:25px;background:var(--paper);box-shadow:0 30px 90px rgba(0,0,0,.4);animation:basiIn .2s ease}.basi-panel.expanded{width:min(760px,calc(100vw - 28px));height:min(760px,calc(100vh - 105px))}.basi-panel[hidden]{display:none}@keyframes basiIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+  .basi-head{display:flex;align-items:center;gap:11px;padding:15px 16px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,rgba(244,214,94,.1),transparent);flex-shrink:0}.basi-head-face{width:39px;height:39px;border-radius:14px;background:var(--yellow-soft);display:grid;place-items:center}.basi-head-face .basi-face{transform:scale(.72)}.basi-head strong{font-family:'Space Grotesk';font-size:13px}.basi-head small{display:block;color:var(--muted);font-size:10px}.basi-head button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:19px}.basi-expand{margin-left:auto}.basi-close{margin-left:0}.basi-messages{flex:1;min-height:0;overflow:auto;padding:15px;display:grid;align-content:start;gap:9px}.basi-message{max-width:90%;padding:10px 12px;border-radius:15px;background:var(--surface);font-size:12px;line-height:1.5}.basi-message.user{justify-self:end;background:var(--yellow-soft)}.basi-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.basi-choice{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:var(--surface);color:var(--ink);font-size:11px;font-weight:800;cursor:pointer}.basi-choice.primary{background:var(--yellow);color:#19180f;border-color:var(--yellow)}.basi-input{display:flex;gap:8px;padding:11px;border-top:1px solid var(--line);flex-shrink:0}.basi-input input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);padding:10px 12px;outline:0}.basi-input button{border:0;border-radius:13px;background:var(--yellow);color:#19180f;font-weight:800;padding:0 13px;cursor:pointer}
+  .basi-tour-backdrop{position:fixed;inset:0;z-index:118;background:rgba(2,3,5,.42);pointer-events:none}.basi-tour-ring{position:fixed;z-index:119;pointer-events:none;border:2px solid var(--yellow);border-radius:22px;box-shadow:0 0 0 9999px rgba(2,3,5,.42),0 0 55px rgba(244,214,94,.4);transition:.45s ease}.basi-tour-card{position:fixed;z-index:120;width:min(340px,calc(100vw - 28px));padding:17px;border:1px solid var(--line);border-radius:20px;background:var(--paper);box-shadow:0 25px 70px rgba(0,0,0,.4);animation:basiIn .25s ease}.basi-tour-avatar{float:left;width:34px;height:34px;margin-right:10px;border-radius:12px;background:var(--yellow-soft);display:grid;place-items:center}.basi-tour-avatar .basi-face{transform:scale(.7)}.basi-tour-card strong{display:block;font-family:'Space Grotesk';font-size:14px;padding-top:5px}.basi-tour-card p{clear:both;margin:12px 0;color:var(--muted);font-size:11px;line-height:1.55}.basi-tour-actions{display:flex;justify-content:flex-end;gap:7px}.basi-tour-actions button{border:1px solid var(--line);border-radius:11px;padding:8px 11px;background:var(--surface);color:var(--ink);font-size:11px;font-weight:800;cursor:pointer}.basi-tour-actions .next{background:var(--yellow);color:#19180f;border-color:var(--yellow)}.basi-flight{position:fixed;z-index:121;pointer-events:none;opacity:0;transition:.55s cubic-bezier(.2,.8,.2,1)}.basi-flight .basi-face{width:38px;height:31px;animation:basiBob .6s ease-in-out infinite alternate}@keyframes basiBob{to{transform:translateY(-5px)}}@media(max-width:600px){.basi-wrap{right:14px;bottom:14px}.basi-panel,.basi-panel.expanded{width:calc(100vw - 28px);height:calc(100vh - 90px);max-height:none;bottom:0;position:fixed;right:14px}.basi-button{width:58px;height:58px}}
+  `;document.head.appendChild(css);
 
-  const cfg = window.SITE_CONFIG || {};
-  const pages = cfg.pages || {};
-  const bot = cfg.bot || {};
-  const candidates = Array.isArray(cfg.election?.candidates) ? cfg.election.candidates : [];
-  const events = Array.isArray(cfg.events) ? cfg.events : [];
-  let currentBanner = cfg.banner?.enabled !== false ? cfg.banner : null;
-  let tourRunning = false;
-
-  const esc = value => String(value ?? '').replace(/[&<>\"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-  const clean = value => String(value || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
-
-  const style = document.createElement('style');
-  style.textContent = `
-    .basi-wrap{position:fixed;right:22px;bottom:22px;z-index:115;font-family:'DM Sans',system-ui,sans-serif}.basi-button{width:58px;height:58px;border:1px solid var(--line);border-radius:20px;background:var(--yellow);color:#19180f;box-shadow:0 18px 50px rgba(0,0,0,.28);cursor:pointer;display:grid;place-items:center;transition:transform .2s ease}.basi-button:hover{transform:translateY(-4px) rotate(-3deg)}
-    .basi-face{width:31px;height:25px;border-radius:11px;background:currentColor;position:relative}.basi-face:before{content:'•  •';position:absolute;left:6px;top:2px;font-size:10px;letter-spacing:4px;color:var(--yellow)}
-    .basi-panel{position:absolute;right:0;bottom:70px;width:min(360px,calc(100vw - 32px));overflow:hidden;border:1px solid var(--line);border-radius:24px;background:var(--paper);box-shadow:0 30px 90px rgba(0,0,0,.38);animation:basiIn .22s ease}.basi-panel[hidden]{display:none}@keyframes basiIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
-    .basi-head{display:flex;align-items:center;gap:11px;padding:16px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,rgba(244,214,94,.1),transparent)}.basi-head-face{width:39px;height:39px;border-radius:14px;background:var(--yellow-soft);display:grid;place-items:center}.basi-head-face .basi-face{transform:scale(.72)}.basi-head strong{font-family:'Space Grotesk';font-size:13px}.basi-head small{display:block;color:var(--muted);font-size:10px}.basi-close{margin-left:auto;border:0;background:transparent;color:var(--muted);font-size:20px;cursor:pointer}
-    .basi-messages{max-height:330px;overflow:auto;padding:14px;display:grid;gap:9px}.basi-message{max-width:90%;padding:10px 12px;border-radius:15px;background:var(--surface);font-size:12px}.basi-message.user{justify-self:end;background:var(--yellow-soft)}.basi-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.basi-choice{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:var(--surface);color:var(--ink);font-size:11px;font-weight:800;cursor:pointer}.basi-choice.primary{background:var(--yellow);color:#19180f;border-color:var(--yellow)}
-    .basi-input{display:flex;gap:8px;padding:11px;border-top:1px solid var(--line)}.basi-input input{min-width:0;flex:1;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);padding:10px 12px;outline:0}.basi-input button{border:0;border-radius:13px;background:var(--yellow);color:#19180f;font-weight:800;padding:0 13px;cursor:pointer}
-    .basi-tour-backdrop{position:fixed;inset:0;z-index:118;background:rgba(2,3,5,.42);pointer-events:none}.basi-tour-ring{position:fixed;z-index:119;pointer-events:none;border:2px solid var(--yellow);border-radius:22px;box-shadow:0 0 0 9999px rgba(2,3,5,.42),0 0 55px rgba(244,214,94,.4);transition:left .45s ease,top .45s ease,width .45s ease,height .45s ease}.basi-tour-card{position:fixed;z-index:120;width:min(340px,calc(100vw - 28px));padding:17px;border:1px solid var(--line);border-radius:20px;background:var(--paper);box-shadow:0 25px 70px rgba(0,0,0,.4);animation:basiIn .25s ease}.basi-tour-avatar{float:left;width:34px;height:34px;margin-right:10px;border-radius:12px;background:var(--yellow-soft);display:grid;place-items:center}.basi-tour-avatar .basi-face{transform:scale(.7)}.basi-tour-card strong{display:block;font-family:'Space Grotesk';font-size:14px;padding-top:5px}.basi-tour-card p{clear:both;margin:12px 0;color:var(--muted);font-size:11px;line-height:1.55}.basi-tour-progress{display:flex;gap:4px;margin-bottom:12px}.basi-tour-progress i{width:17px;height:3px;border-radius:99px;background:var(--line)}.basi-tour-progress i.on{background:var(--yellow)}.basi-tour-actions{display:flex;justify-content:flex-end;gap:7px}.basi-tour-actions button{border:1px solid var(--line);border-radius:11px;padding:8px 11px;background:var(--surface);color:var(--ink);font-size:11px;font-weight:800;cursor:pointer}.basi-tour-actions .next{background:var(--yellow);color:#19180f;border-color:var(--yellow)}.basi-flight{position:fixed;z-index:121;pointer-events:none;opacity:0;transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .25s ease}.basi-flight .basi-face{width:38px;height:31px;animation:basiBob .6s ease-in-out infinite alternate}@keyframes basiBob{to{transform:translateY(-5px)}}@media(max-width:600px){.basi-wrap{right:14px;bottom:14px}}
-  `;
-  document.head.appendChild(style);
-
-  function getKnowledge() {
-    const items = [];
-    for (const route of cfg.routes || []) {
-      const page = route.page === 'content' ? pages[route.content] : pages[route.page];
-      let text = [route.label, route.path, page?.eyebrow, page?.title, page?.body].filter(Boolean).join(' ');
-      (page?.sections || []).forEach(section => { text += ` ${section.title || ''} ${section.body || ''} ${(section.items || []).join(' ')}`; });
-      items.push({ text:clean(text), answer:page?.body || `The ${route.label} page has more information.`, actions:[{label:`Go to ${route.label}`,path:route.path,primary:true}] });
-    }
-    candidates.forEach(c => items.push({text:clean([c.name,c.role,c.grade,c.statement].join(' ')),answer:`${c.name} is running for ${c.role || 'Student Council'}${c.grade ? ` and is in ${c.grade}.` : '.'}${c.statement ? ` Their message: “${c.statement}”` : ''}`,actions:[{label:'See candidates',path:'/vote',primary:true}]}));
-    events.forEach(e => items.push({text:clean([e.title,e.tag,e.date,e.time,e.place].join(' ')),answer:`${e.title} is ${e.date || 'scheduled'}${e.time ? ` at ${e.time}` : ''}${e.place ? ` in ${e.place}` : ''}.`,actions:[{label:'Open Events',path:'/events',primary:true}]}));
-    if(currentBanner) items.push({text:clean(JSON.stringify(currentBanner)),answer:`The current announcement is “${currentBanner.title || ''}”${currentBanner.message ? ` — ${currentBanner.message}` : ''}`,actions:[]});
-    (Array.isArray(bot.knowledge) ? bot.knowledge : []).forEach(item => items.push({text:clean([item.title,item.keywords,item.answer,item.body].flat().join(' ')),answer:item.answer || item.body || '',actions:Array.isArray(item.actions) ? item.actions : []}));
-    return items;
-  }
-
-  function answer(question) {
-    const q=clean(question);
-    if(!q)return {text:'Ask me something! 💛'};
-    if(/\b(tour|show me|guide me)\b/.test(q))return {text:'Absolutely! I can show you around. ✈️',actions:[{label:'Start the tour',tour:true,primary:true}]};
-    if(/\b(hi|hello|hey|yo)\b/.test(q))return {text:'Hey! 👋 I’m Basi. Ask me about candidates, grades, positions, events, pages, or announcements.',actions:[{label:'Show me around',tour:true,primary:true},{label:'Who is running?',path:'/vote'}]};
-    if(/who are you|what are you|your name/.test(q))return {text:'I’m Basi — your tiny Student Council guide. 💛'};
-    if(/thank|thanks/.test(q))return {text:'Anytime! 💛'};
-    let best=null,bestScore=0;
-    for(const item of getKnowledge()){
-      let score=item.text.includes(q)?8:0;
-      q.split(' ').forEach(word=>{if(word&&item.text.includes(word))score+=word.length>4?2:1});
-      if(score>bestScore){bestScore=score;best=item}
-    }
-    return best||{text:'I don’t know that yet. You can teach me in bot-config.js!',actions:[{label:'Meet candidates',path:'/vote'},{label:'Show me around',tour:true}]};
-  }
-
-  function go(path){
-    const link=document.querySelector(`[data-route="${CSS.escape(path)}"]`);
-    if(link){link.click();return;}
-    history.pushState({},'',path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  }
-
-  function waitFor(selector, callback, tries=0){
-    if(tourRunning===false)return;
-    const target=document.querySelector(selector);
-    if(target){callback(target);return;}
-    if(tries>=100){callback(null);return;}
-    window.setTimeout(()=>waitFor(selector,callback,tries+1),60);
-  }
-
-  function getSteps(){
-    const fallback=[
-      {selector:'.brand',title:'Welcome to Bayside Academy',text:'This is your Student Council home base.'},
-      {selector:'#mainNav',title:'Navigation',text:'These links take you around the site.'},
-      {selector:'#searchButton',title:'Search everything',text:'Search pages, candidates, events, and more.'},
-      {selector:'.hero-card',title:'Election dashboard',text:'Your quick look at the current election.'},
-      {selector:'.candidate-grid',title:'Candidates',text:'Ask me about candidates by name, grade, or position.'},
-      {route:'/events',selector:'.event-list',title:'Events',text:'Here is the complete Events page.'},
-      {route:'/vote',selector:'.candidate-grid',title:'All candidates',text:'This page contains the full candidate list.'},
-      {route:'/terms',selector:'.document-page',title:'Terms & Conditions',text:'Your site rules and election guidelines live here.'},
-      {route:'/',selector:'#liveBanner',title:'Live announcements',text:'These announcements can update without a refresh.'},
-      {selector:'.site-footer',title:'Every page',text:'All site links are collected here.'},
-      {selector:'.basi-button',title:'That’s me!',text:'I can answer questions and guide you around the site.'}
-    ];
-    const custom=Array.isArray(bot.tour)?bot.tour.filter(step=>step&&typeof step==='object'&&typeof step.selector==='string'&&step.selector.trim()):[];
-    return custom.length?custom:fallback;
-  }
-
-  function runTour(){
-    if(tourRunning)return;
-    const steps=getSteps();
-    if(!steps.length)return;
-    tourRunning=true;
-    const backdrop=document.createElement('div');
-    const ring=document.createElement('div');
-    const card=document.createElement('div');
-    const flight=document.createElement('div');
-    backdrop.className='basi-tour-backdrop';
-    ring.className='basi-tour-ring';
-    card.className='basi-tour-card';
-    flight.className='basi-flight';
-    flight.innerHTML='<span class="basi-face"></span>';
-    document.body.append(backdrop,ring,card,flight);
-    let index=0;
-    let token=0;
-
-    function cleanup(){
-      tourRunning=false;
-      token+=1;
-      backdrop.remove();ring.remove();card.remove();flight.remove();
-      try{localStorage.setItem('basi-tour-seen','1')}catch{}
-    }
-
-    function next(){
-      if(!tourRunning)return;
-      if(index>=steps.length){cleanup();return;}
-      const myToken=++token;
-      const step=steps[index];
-      if(!step||typeof step!=='object'||typeof step.selector!=='string'){index+=1;next();return;}
-      if(step.route && location.pathname.replace(/\/$/,'')!==String(step.route).replace(/\/$/,'') && !(location.pathname==='/'&&step.route==='/'))go(step.route);
-      waitFor(step.selector,target=>{
-        if(!tourRunning||myToken!==token)return;
-        if(!target){index+=1;next();return;}
-        target.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});
-        window.setTimeout(()=>{
-          if(!tourRunning||myToken!==token)return;
-          const r=target.getBoundingClientRect(),pad=8;
-          ring.style.left=`${Math.max(8,r.left-pad)}px`;
-          ring.style.top=`${Math.max(8,r.top-pad)}px`;
-          ring.style.width=`${Math.max(20,r.width+pad*2)}px`;
-          ring.style.height=`${Math.max(20,r.height+pad*2)}px`;
-          flight.style.left=`${innerWidth/2-19}px`;flight.style.top=`${innerHeight+30}px`;flight.style.opacity='1';flight.style.transform='translate(0,0)';flight.getBoundingClientRect();flight.style.transform=`translate(${r.left+r.width/2-innerWidth/2}px,${r.top+r.height/2-innerHeight}px)`;setTimeout(()=>{if(tourRunning)flight.style.opacity='0'},380);
-          const width=Math.min(340,innerWidth-28),left=Math.max(14,Math.min(r.left,innerWidth-width-14)),top=r.bottom+18<innerHeight-175?r.bottom+18:Math.max(14,r.top-180);
-          card.style.width=`${width}px`;card.style.left=`${left}px`;card.style.top=`${top}px`;
-          card.innerHTML=`<span class="basi-tour-avatar"><span class="basi-face"></span></span><strong>${esc(step.title||'Here')}</strong><p>${esc(step.text||'')}</p><div class="basi-tour-progress">${steps.map((_,i)=>`<i class="${i<=index?'on':''}"></i>`).join('')}</div><div class="basi-tour-actions"><button type="button" data-skip>Skip</button><button type="button" class="next" data-next>${index===steps.length-1?'Finish':'Next'}</button></div>`;
-          card.querySelector('[data-skip]').onclick=cleanup;
-          card.querySelector('[data-next]').onclick=()=>{index+=1;next()};
-        },430);
-      });
-    }
-    next();
-  }
-
-  function build(){
-    const wrap=document.createElement('div');
-    wrap.className='basi-wrap';
-    wrap.innerHTML='<div class="basi-panel" hidden><div class="basi-head"><span class="basi-head-face"><span class="basi-face"></span></span><div><strong>Basi</strong><small>Your little council guide</small></div><button class="basi-close" type="button" aria-label="Close">×</button></div><div class="basi-messages" aria-live="polite"></div><form class="basi-input"><input placeholder="Ask me something…" aria-label="Ask Basi" autocomplete="off"><button type="submit">Send</button></form></div><button class="basi-button" type="button" aria-label="Open Basi"><span class="basi-face"></span></button>';
-    document.body.appendChild(wrap);
-    const panel=wrap.querySelector('.basi-panel');
-    const messages=wrap.querySelector('.basi-messages');
-    const input=wrap.querySelector('input');
-    const say=(text,user=false,actions=[])=>{
-      const el=document.createElement('div');el.className=`basi-message${user?' user':''}`;el.textContent=text;
-      if(actions.length){const box=document.createElement('div');box.className='basi-buttons';actions.forEach(a=>{const b=document.createElement('button');b.type='button';b.className=`basi-choice${a.primary?' primary':''}`;b.textContent=a.label||'Open';b.onclick=()=>{if(a.tour){panel.hidden=true;runTour()}else if(a.path){panel.hidden=true;go(a.path)}else if(a.url)window.open(a.url,'_blank','noopener,noreferrer')};box.appendChild(b)});el.appendChild(box)}
-      messages.appendChild(el);messages.scrollTop=messages.scrollHeight;
-    };
-    wrap.querySelector('.basi-button').onclick=()=>{panel.hidden=!panel.hidden;if(!panel.hidden&&!messages.children.length){const suggestions=Array.isArray(bot.suggestions)&&bot.suggestions.length?bot.suggestions:[{label:'Show me around',tour:true,primary:true},{label:'Who is running?',path:'/vote'}];say('Hi! I’m Basi. 💛 Ask me about candidates, grades, positions, events, pages, or announcements.',false,suggestions)}};
-    wrap.querySelector('.basi-close').onclick=()=>{panel.hidden=true};
-    wrap.querySelector('form').onsubmit=e=>{e.preventDefault();const q=input.value.trim();if(!q)return;say(q,true);input.value='';const result=answer(q);setTimeout(()=>say(result.text,false,result.actions||[]),220)};
-  }
-
-  build();
-  window.BASI_BOT={refresh(){currentBanner=cfg.banner?.enabled!==false?cfg.banner:null},tour:runTour};
-  window.addEventListener('load',()=>{try{if(!localStorage.getItem('basi-tour-seen'))setTimeout(runTour,1100)}catch{}},{once:true});
+  function knowledge(){const out=[];for(const r of cfg.routes||[]){const p=r.page==='content'?pages[r.content]:pages[r.page];out.push({kind:'page',name:r.label,path:r.path,title:p?.title||r.label,text:norm([r.label,r.path,p?.title,p?.eyebrow].join(' ')),answer:p?.title?`${p.title} is the ${r.label} section of the Student Council site.`:`You can find that in ${r.label}.`})}candidates.forEach(c=>out.push({kind:'candidate',name:c.name,role:c.role,grade:c.grade,path:'/vote',text:norm([c.name,c.role,c.grade].join(' ')),answer:`${c.name} is running for ${c.role||'a Student Council position'}${c.grade?` and is in ${c.grade}`:''}.`}));events.forEach(e=>out.push({kind:'event',name:e.title,path:'/events',text:norm([e.title,e.date,e.time,e.place,e.tag].join(' ')),answer:`${e.title}${e.date?` is on ${e.date}`:''}${e.time?` at ${e.time}`:''}${e.place?` in ${e.place}`:''}.`}));(bot.knowledge||[]).filter(x=>x&&typeof x==='object').forEach(x=>out.push({kind:'custom',name:x.title||x.name||'Info',text:norm([x.title,x.name,x.keywords].flat().join(' ')),answer:x.answer||x.summary||x.shortAnswer||'',actions:x.actions||[]}));return out}
+  function find(q){const n=norm(q);if(!n)return null;const words=n.split(' ').filter(w=>w.length>2);let best=null,score=0;for(const x of knowledge()){let s=0;if(x.text.includes(n))s+=20;for(const w of words)if(x.text.includes(w))s+=w.length>4?3:1;if(s>score){score=s;best=x}}return score>=3?best:null}
+  function route(path){const normalized=String(path||'/').replace(/\/+$/,'')||'/';const link=[...document.querySelectorAll('[data-route]')].find(a=>String(a.getAttribute('data-route')).replace(/\/+$/,'')===normalized);if(link){link.click();return}history.pushState({},'',normalized);window.dispatchEvent(new PopStateEvent('popstate'))}
+  function openApply(){const direct=document.querySelector('[data-open-apply],[data-apply-embed],#applyEmbedButton,#applyButton');if(direct){direct.click();return}route('/apply')}
+  function result(q){const n=norm(q);if(/\b(apply|application|applications|sign up|run for)\b/.test(n))return{text:'Yep! I can take you straight to the application. 💛',actions:[{label:'Open application',run:openApply,primary:true},{label:'Open full Basi',run:()=>setExpanded(true)}]};if(/\b(fullscreen|full screen|expand|bigger)\b/.test(n))return{text:'Done — let’s give Basi some room. ✨',actions:[{label:'Expand chat',run:()=>setExpanded(true),primary:true}]};if(/\b(tour|guide me|show me around)\b/.test(n))return{text:'Absolutely! I’ll fly around the actual pages with you. ✈️',actions:[{label:'Start tour',run:runTour,primary:true}]};if(/\b(hi|hello|hey)\b/.test(n))return{text:'Hey! I’m Basi. 💛 Ask me about a candidate, position, grade, event, page, or how to apply.',actions:[{label:'How do I apply?',question:'how do I apply?'},{label:'Who is running?',path:'/vote'}]};const hit=find(n);if(hit)return{text:hit.answer||`I found ${hit.name}.`,actions:[...(hit.path?[{label:hit.kind==='candidate'?'View candidates':`Open ${hit.name}`,path:hit.path,primary:true}]:[]),...(Array.isArray(hit.actions)?hit.actions:[])]};return{text:'I don’t have a specific answer for that yet. Try a name, grade, position, event, or page. You can add short answers to bot-config.js.'}}
+  function setExpanded(v){expanded=v;const p=document.querySelector('.basi-panel');if(p){p.classList.toggle('expanded',expanded);p.querySelector('.basi-expand')?.setAttribute('aria-label',expanded?'Collapse chat':'Expand chat')}}
+  function waitForRoute(path,done,count=0){const wanted=String(path||'/').replace(/\/+$/,'')||'/';const current=location.pathname.replace(/\/+$/,'')||'/';if(current===wanted){done();return}if(count>=80){done();return}setTimeout(()=>waitForRoute(path,done,count+1),60)}
+  function wait(selector,done,count=0){if(!tourRunning)return;const el=document.querySelector(selector);if(el){done(el);return}if(count>=120){done(null);return}setTimeout(()=>wait(selector,done,count+1),60)}
+  function steps(){const defaults=[{selector:'.brand',title:'Welcome',text:'This is your Student Council home base.'},{selector:'#mainNav',title:'Navigation',text:'These links take you around the site.'},{selector:'#searchButton',title:'Search',text:'Search the entire site from here.'},{selector:'.hero-card',title:'Election dashboard',text:'A quick look at what is happening.'},{route:'/vote',selector:'.candidate-grid',title:'Candidates',text:'The full candidate list lives here.'},{route:'/events',selector:'.event-list',title:'Events',text:'Upcoming events are collected here.'},{route:'/terms',selector:'.document-page',title:'Terms & Conditions',text:'The site rules live here.'},{route:'/',selector:'#liveBanner',title:'Announcements',text:'Live banners can update without a refresh.'},{selector:'.site-footer',title:'Footer',text:'All site links are available here.'},{selector:'.basi-button',title:'Basi',text:'And I’m always here if you need help.'}];return Array.isArray(bot.tour)&&bot.tour.length?bot.tour.filter(s=>s&&typeof s==='object'&&typeof s.selector==='string'&&s.selector.trim()):defaults}
+  function runTour(){if(tourRunning)return;tourRunning=true;const ss=steps(),back=document.createElement('div'),ring=document.createElement('div'),card=document.createElement('div'),fly=document.createElement('div');back.className='basi-tour-backdrop';ring.className='basi-tour-ring';card.className='basi-tour-card';fly.className='basi-flight';fly.innerHTML='<span class="basi-face"></span>';document.body.append(back,ring,card,fly);let i=0,token=0;const end=()=>{tourRunning=false;token++;back.remove();ring.remove();card.remove();fly.remove()};const next=()=>{if(!tourRunning)return;if(i>=ss.length){end();return}const t=ss[i],my=++token;if(!t||typeof t!=='object'||typeof t.selector!=='string'){i++;next();return}if(t.route)route(t.route);waitForRoute(t.route||location.pathname,()=>{wait(t.selector,el=>{if(!tourRunning||my!==token)return;if(!el){i++;next();return}el.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});setTimeout(()=>{if(!tourRunning||my!==token)return;const r=el.getBoundingClientRect(),p=8;ring.style.left=`${Math.max(8,r.left-p)}px`;ring.style.top=`${Math.max(8,r.top-p)}px`;ring.style.width=`${Math.max(20,r.width+p*2)}px`;ring.style.height=`${Math.max(20,r.height+p*2)}px`;fly.style.left=`${innerWidth/2-18}px`;fly.style.top=`${innerHeight+20}px`;fly.style.opacity=1;fly.style.transform=`translate(${r.left+r.width/2-innerWidth/2}px,${r.top+r.height/2-innerHeight}px)`;card.style.left=`${Math.max(14,Math.min(r.left,innerWidth-354))}px`;card.style.top=`${r.bottom+20<innerHeight-180?r.bottom+20:Math.max(14,r.top-180)}px`;card.innerHTML=`<span class="basi-tour-avatar"><span class="basi-face"></span></span><strong>${esc(t.title||'Here')}</strong><p>${esc(t.text||'')}</p><div class="basi-tour-actions"><button data-skip>Skip</button><button class="next" data-next>${i===ss.length-1?'Finish':'Next'}</button></div>`;card.querySelector('[data-skip]').onclick=end;card.querySelector('[data-next]').onclick=()=>{i++;next()};setTimeout(()=>fly.style.opacity=0,400)},430)},0)},0)};next()}
+  function build(){const w=document.createElement('div');w.className='basi-wrap';w.innerHTML='<div class="basi-panel" hidden><div class="basi-head"><span class="basi-head-face"><span class="basi-face"></span></span><div><strong>Basi</strong><small>Your little council guide</small></div><button class="basi-expand" type="button" aria-label="Expand chat">⤢</button><button class="basi-close" type="button" aria-label="Close">×</button></div><div class="basi-messages"></div><form class="basi-input"><input placeholder="Ask me something…" autocomplete="off"><button>Send</button></form></div><button class="basi-button" type="button" aria-label="Open Basi"><span class="basi-face"></span></button>';document.body.appendChild(w);const panel=w.querySelector('.basi-panel'),messages=w.querySelector('.basi-messages'),input=w.querySelector('input');const say=(text,user=false,actions=[])=>{const el=document.createElement('div');el.className=`basi-message${user?' user':''}`;el.textContent=text;if(actions.length){const box=document.createElement('div');box.className='basi-buttons';actions.forEach(a=>{const b=document.createElement('button');b.type='button';b.className=`basi-choice${a.primary?' primary':''}`;b.textContent=a.label;b.onclick=()=>{if(a.run)a.run();else if(a.question){say(a.label,true);setTimeout(()=>{const r=result(a.question);say(r.text,false,r.actions)},120)}else if(a.path){panel.hidden=true;route(a.path)}};box.appendChild(b)});el.appendChild(box)}messages.appendChild(el);messages.scrollTop=messages.scrollHeight};w.querySelector('.basi-button').onclick=()=>{panel.hidden=!panel.hidden;if(!panel.hidden&&!messages.children.length)say('Hi! I’m Basi. 💛 Ask me about candidates, grades, positions, events, pages, or applying.',false,[{label:'Show me around',run:runTour,primary:true},{label:'How do I apply?',question:'how do I apply?'}])};w.querySelector('.basi-close').onclick=()=>panel.hidden=true;w.querySelector('.basi-expand').onclick=()=>setExpanded(!expanded);w.querySelector('form').onsubmit=e=>{e.preventDefault();const q=input.value.trim();if(!q)return;say(q,true);input.value='';const r=result(q);setTimeout(()=>say(r.text,false,r.actions),160)}}
+  build();window.BASI_BOT={tour:runTour,expand:()=>setExpanded(true)};window.addEventListener('load',()=>{try{if(!localStorage.getItem('basi-tour-seen'))setTimeout(runTour,1000)}catch{}},{once:true});
 })();
