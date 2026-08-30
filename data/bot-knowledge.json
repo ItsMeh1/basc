@@ -1,0 +1,69 @@
+{
+  "knowledge": [
+    {
+      "topic": "How voting works",
+      "keywords": ["vote", "voting", "ballot", "election"],
+      "answer": "Voting uses the official ballot on the Vote page.",
+      "actions": [
+        { "label": "Go to Vote", "path": "/vote", "primary": true }
+      ]
+    },
+    {
+      "topic": "How to apply",
+      "keywords": ["apply", "application", "join", "running"],
+      "answer": "The Apply page has the official application and the information you need before submitting it.",
+      "actions": [
+        { "label": "Go to Apply", "path": "/apply", "primary": true },
+        { "label": "Read the Terms", "path": "/terms" }
+      ]
+    },
+    {
+      "topic": "Terms & Conditions",
+      "keywords": ["terms", "conditions", "rules", "guidelines"],
+      "answer": "The Terms & Conditions page contains the site's rules and election guidelines.",
+      "actions": [
+        { "label": "Read the Terms", "path": "/terms", "primary": true }
+      ]
+    },
+    {
+      "topic": "Events",
+      "keywords": ["events", "event", "meetings", "assemblies", "dances", "calendar"],
+      "answer": "The Events page has the current schedule.",
+      "actions": [
+        { "label": "View all events", "path": "/events", "primary": true }
+      ]
+    },
+    {
+      "topic": "About",
+      "keywords": ["about", "student council", "council"],
+      "answer": "The About page explains what Student Council does and how it helps the school community.",
+      "actions": [
+        { "label": "About Us", "path": "/about", "primary": true }
+      ]
+    },
+    {
+      "topic": "Who made this?",
+      "keywords": ["who made this", "made this", "creator", "developer"],
+      "answer": "Omar made this.... of course... who else would have made this thing? 😭"
+    },
+    {
+      "topic": "Frequently Asked Questions",
+      "keywords": ["faq", "frequently asked questions", "questions"],
+      "answer": "The FAQ page has answers to the most common questions.",
+      "actions": [
+        { "label": "Go to FAQ", "path": "/faq", "primary": true },
+        { "label": "Go to About", "path": "/about" }
+      ]
+    },
+    {
+      "topic": "Who am I?",
+      "keywords": ["who are you", "your name", "whats your name", "what is your name"],
+      "answer": "I'm Basi, your little Student Council guide. 💛"
+    }
+  ],
+  "suggestions": [
+    { "label": "Meet candidates", "path": "/vote" },
+    { "label": "See events", "path": "/events" },
+    { "label": "Show me around", "tour": true }
+  ]
+}
