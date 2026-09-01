@@ -71,7 +71,7 @@ window.SITE_CONFIG = {
   pages: {
     home: { eyebrow: 'Your school. Your voice.', title: 'Make campus better, one idea at a time.', body: 'Student Council is where ideas become action. Vote in elections, apply for a role, and help shape what happens on campus.' },
     vote: { eyebrow: 'Election 2026–27', title: 'Cast your vote.', body: 'Meet the candidates, then use the official school ballot to make your voice count.' },
-    apply: { eyebrow: 'Get involved', title: 'Bring an idea. Make an impact.', body: 'Tell us what you care about and where you would like to help. You do not need experience to get involved.' },
+    apply: { eyebrow: 'Get involved', title: 'Bring an idea. Make an impact.', body: 'Help change what you care about most & bring more to the table' },
     events: { eyebrow: 'Calendar', title: "What's happening on campus.", body: 'Meet people, join in, and show up for the parts of school you want to shape.' },
     about: { eyebrow: 'About council', title: 'A student voice with a real seat at the table.', body: 'Student Council connects student ideas with real school decisions through events, advocacy, and student-led projects.' },
     faq: { eyebrow: 'Help', title: 'Frequently asked questions.' },
