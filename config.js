@@ -55,7 +55,12 @@ window.SITE_CONFIG = {
   googleForms: {
     enabled: true,
     apply: { mode: 'embed', formUrl: 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform', embedUrl: 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?embedded=true', buttonLabel: 'Open application form' },
-    vote: { mode: 'embed', formUrl: 'https://docs.google.com/forms/d/e/YOUR_VOTE_FORM_ID/viewform', embedUrl: 'https://docs.google.com/forms/d/e/YOUR_VOTE_FORM_ID/viewform?embedded=true', buttonLabel: 'Open official ballot' }
+    vote: {
+      mode: 'embed',
+      formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSei6uWK347DW59ahNcdFxyMh2lHn0x-JLAnee6n0d5h_xl02g/viewform',
+      embedUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSei6uWK347DW59ahNcdFxyMh2lHn0x-JLAnee6n0d5h_xl02g/viewform?embedded=true',
+      buttonLabel: 'Open official ballot'
+    }
   },
 
   routes: [
