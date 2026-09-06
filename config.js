@@ -102,10 +102,7 @@ window.SITE_CONFIG = {
     { id: `example`, name: 'exF', role: 'governor', grade: '6th', statement: 'me statement!', bio: 'me biogrophy!', slogan: 'me slogan!', experience: 'me experience!', activities: ['activity 1', 'activity 2!'], funFact: 'very fun facr!', priorities: [ 'me main priority! ', 'me 2nd main priority!' ] }
   ] },
   events: [
-    { date: 'SEP 05', title: 'Welcome Back Assembly', time: '10:15 AM', place: 'Main Hall', tag: 'Campus' },
-    { date: 'SEP 11', title: 'Clubs Fair', time: '3:30 PM', place: 'Quad', tag: 'Community' },
-    { date: 'SEP 18', title: 'Election Day', time: 'All day', place: 'Online', tag: 'Elections' },
-    { date: 'SEP 24', title: 'Open Council Meeting', time: '4:00 PM', place: 'Room 204', tag: 'Council' }
+    { date: 'SEP 18, 2026', title: 'Applications Deadline', time: '3:15 PM', place: 'Room 8/9/Office', tag: 'Campus' }
   ],
   committees: [
     { title: 'Student Life', body: 'Improve campus culture, spirit, inclusion, and the everyday student experience.', icon: '✦' },
