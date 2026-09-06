@@ -102,7 +102,7 @@ window.SITE_CONFIG = {
     { id: `example`, name: 'exF', role: 'governor', grade: '6th', statement: 'me statement!', bio: 'me biogrophy!', slogan: 'me slogan!', experience: 'me experience!', activities: ['activity 1', 'activity 2!'], funFact: 'very fun facr!', priorities: [ 'me main priority! ', 'me 2nd main priority!' ] }
   ] },
   events: [
-    { date: 'SEP 18, 2026', title: 'Applications Deadline', time: '3:15 PM', place: 'Room 8/9/Office', tag: 'Campus' }
+    { date: 'SEP 18', title: 'Applications Deadline', time: 'September 18, 2026 @ 3:15 PM', place: 'Room 8/9/Office', tag: 'Campus' }
   ],
   committees: [
     { title: 'Student Life', body: 'Improve campus culture, spirit, inclusion, and the everyday student experience.', icon: '✦' },
