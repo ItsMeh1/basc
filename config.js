@@ -99,7 +99,7 @@ window.SITE_CONFIG = {
   election: { title: '2026–27 Student Council Election', deadline: 'Friday, September 18 · 4:00 PM', candidates: [
     { id: 'maya-chen', name: 'Maya Chen', role: 'President', grade: '11th', statement: 'I want a council that listens first and follows through.' },
     { id: 'jordan-lee', name: 'Jordan Lee', role: 'President', grade: '12th', statement: 'More events, clearer communication, and a campus that feels connected.' },
-    { id: 'samira-patel', name: 'Samira Patel', role: 'President', grade: '11th', statement: 'Let’s turn student ideas into visible, measurable improvements.' }
+    { id: `example`, name: 'exF', role: 'governor', grade: '6th', statement: 'me statement!', bio: 'me biogrophy!', slogan: 'me slogan!', experience: 'me experience!', activities: ['activity 1', 'activity 2!'], funFact: 'very fun facr!', priorities: [ 'me main priority! ', 'me 2nd main priority!' ] }
   ] },
   events: [
     { date: 'SEP 05', title: 'Welcome Back Assembly', time: '10:15 AM', place: 'Main Hall', tag: 'Campus' },
