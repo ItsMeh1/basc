@@ -1,4 +1,3 @@
-/* Single source of truth for navigable URLs. Keep this file dependency-free so the service worker can import it. */
 (function (root) {
   root.BASC_SITE_MAP = {
     home: '/',
@@ -8,12 +7,14 @@
     about: '/about',
     faq: '/faq',
     terms: '/terms',
+    results: '/results',
     aliases: {
       '/v': '/vote',
       '/a': '/apply',
       '/e': '/events',
       '/abt': '/about',
-      '/t': '/terms'
+      '/t': '/terms',
+      '/r': '/results'
     }
   };
 })(typeof self !== 'undefined' ? self : window);
