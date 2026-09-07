@@ -1,3 +1,5 @@
+importScripts('/site-map.js');
+
 const VERSION='basc-v2.7.0-root-assets';
 const CORE=[
   '/',
