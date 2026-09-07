@@ -103,8 +103,8 @@ window.SITE_CONFIG = {
     refreshMs: 3000,
     timestampColumn: 'Timestamp',
     positions: [
-      { title: '6th Grade Representative', columns: [{ name: 'Choose your Student Representatives', occurrence: 1 }], grade: '6' },
-      { title: '7th Grade Representative', columns: [{ name: 'Choose your Student Representatives', occurrence: 2 }], grade: '7' },
+      { title: '6th Grade Representative', columns: ['Choose your Student Representatives (6th)'] },
+      { title: '7th Grade Representative', columns: ['Choose your Student Representatives (7th)'] },
       { title: 'President', columns: ['Choose your President'] },
       { title: 'Vice President', columns: ['Choose your Vice President'] },
       { title: 'Treasurer', columns: ['Choose your Treasurer'] },
