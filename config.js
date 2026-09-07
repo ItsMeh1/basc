@@ -69,6 +69,7 @@ window.SITE_CONFIG = {
     { path: '/apply', label: 'Apply', nav: true, page: 'apply' },
     { path: '/events', label: 'Events', nav: true, page: 'events' },
     { path: '/about', label: 'About', nav: true, page: 'about' },
+    { path: '/results', label: 'Results', nav: true, page: 'results' },
     { path: '/faq', label: 'FAQ', nav: false, page: 'faq' },
     { path: '/terms', label: 'Terms & Conditions', nav: false, page: 'content', content: 'terms' }
   ],
@@ -80,6 +81,7 @@ window.SITE_CONFIG = {
     events: { eyebrow: 'Calendar', title: "What's happening on campus.", body: 'Meet people, join in, and show up for the parts of school you want to shape.' },
     about: { eyebrow: 'About council', title: 'A student voice with a real seat at the table.', body: 'Student Council connects student ideas with real school decisions through events, advocacy, and student-led projects.' },
     faq: { eyebrow: 'Help', title: 'Frequently asked questions.' },
+    results: { eyebrow: 'Live election', title: 'Election results.', body: 'Results update automatically from the official response CSV.' },
     terms: {
       type: 'content', eyebrow: 'Legal', title: 'Terms & Conditions',
       body: 'A simple guide to using the Bayside Academy Student Council website.',
@@ -93,6 +95,22 @@ window.SITE_CONFIG = {
         { title: 'Changes to these terms', body: 'These terms may be updated when the site or its services change. The current version will always be posted on this page.' }
       ]
     }
+  },
+
+  results: {
+    enabled: true,
+    csvUrl: '',
+    refreshMs: 15000,
+    timestampColumn: 'Timestamp',
+    positions: [
+      { title: 'Student Representatives', columns: ['Choose your Student Representatives'] },
+      { title: 'President', columns: ['Choose your President'] },
+      { title: 'Vice President', columns: ['Choose your Vice President'] },
+      { title: 'Treasurer', columns: ['Choose your Treasurer'] },
+      { title: 'Secretary', columns: ['Choose your Secretary'] },
+      { title: 'Campus Spirit Coordinator', columns: ['Choose your Campus Spirit Coordinator'] },
+      { title: 'Tech Lead', columns: ['Choose your Tech Lead'] }
+    ]
   },
 
   stats: [['Student-led', 'initiatives'], ['Open', 'student voice'], ['One', 'school community']],
