@@ -81,7 +81,7 @@ window.SITE_CONFIG = {
     events: { eyebrow: 'Calendar', title: "What's happening on campus.", body: 'Meet people, join in, and show up for the parts of school you want to shape.' },
     about: { eyebrow: 'About council', title: 'A student voice with a real seat at the table.', body: 'Student Council connects student ideas with real school decisions through events, advocacy, and student-led projects.' },
     faq: { eyebrow: 'Help', title: 'Frequently asked questions.' },
-    results: { eyebrow: 'Live election', title: 'Election results.', body: 'Results update automatically from the official response CSV.' },
+    results: { eyebrow: 'Live election', title: 'Election results.', body: 'Results update automatically as new responses are received.' },
     terms: {
       type: 'content', eyebrow: 'Legal', title: 'Terms & Conditions',
       body: 'A simple guide to using the Bayside Academy Student Council website.',
@@ -99,7 +99,7 @@ window.SITE_CONFIG = {
 
   results: {
     enabled: true,
-    csvUrl: '',
+    csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTjESC7btbBe1Lkj2iCJJxLvizekEqFZihAKJUdgO0uehtiXAaAdnkTk_hgAkzhP4tytUvn4ygPVYT0/pub?gid=708436367&single=true&output=csv',
     refreshMs: 15000,
     timestampColumn: 'Timestamp',
     positions: [
