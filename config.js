@@ -57,8 +57,8 @@ window.SITE_CONFIG = {
     apply: { mode: 'embed', formUrl: 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform', embedUrl: 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?embedded=true', buttonLabel: 'Open application form' },
     vote: {
       mode: 'embed',
-      formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSei6uWK347DW59ahNcdFxyMh2lHn0x-JLAnee6n0d5h_xl02g/viewform',
-      embedUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSei6uWK347DW59ahNcdFxyMh2lHn0x-JLAnee6n0d5h_xl02g/viewform?embedded=true',
+      formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSf7zi5M9fNYD28imisk2tV_M5ZJHrUgD52h2MRKxoMlJzwq4w/viewform',
+      embedUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSf7zi5M9fNYD28imisk2tV_M5ZJHrUgD52h2MRKxoMlJzwq4w/viewform?embedded=true',
       buttonLabel: 'Open official ballot'
     }
   },
