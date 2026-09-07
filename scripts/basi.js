@@ -102,15 +102,15 @@
     if(!card) return '';
     if(card.type==='candidate'){
       const c=card.data;
-      return `<article class="basi-card"><div class="basi-card-head"><div class="basi-card-avatar">${esc(avatar(c.name))}</div><div class="basi-card-title"><strong>${esc(c.name)}</strong><span>${esc(c.role || 'Candidate')}</span></div></div><div class="basi-card-body"><p>${esc(c.statement || 'No candidate statement has been added.')}</p><div class="basi-card-meta"><div class="basi-meta"><small>Grade</small><strong>${esc(c.grade || '—')}</strong></div><div class="basi-meta"><small>Position</small><strong>${esc(c.role || '—')}</strong></div></div></div>${actionButtons([{label:'View candidates',path:'/vote',primary:true}])}</article>`;
+      return `<article class="basi-card"><div class="basi-card-head"><div class="basi-card-avatar">${esc(avatar(c.name))}</div><div class="basi-card-title"><strong>${esc(c.name)}</strong><span>${esc(c.role || 'Candidate')}</span></div></div><div class="basi-card-body"><p>${esc(c.statement || 'No candidate statement has been added.')}</p><div class="basi-card-meta"><div class="basi-meta"><small>Grade</small><strong>${esc(c.grade || '—')}</strong></div><div class="basi-meta"><small>Position</small><strong>${esc(c.role || '—')}</strong></div></div></div></article>`;
     }
     if(card.type==='event'){
       const e=card.data;
-      return `<article class="basi-card"><div class="basi-card-head"><div class="basi-card-avatar">${esc((String(e.date||'').match(/[A-Z]+/)||['EV'])[0].slice(0,2))}</div><div class="basi-card-title"><strong>${esc(e.title)}</strong><span>${esc(e.tag || 'Event')}</span></div></div><div class="basi-card-body"><div class="basi-card-meta"><div class="basi-meta"><small>Date</small><strong>${esc(e.date || '—')}</strong></div><div class="basi-meta"><small>Time</small><strong>${esc(e.time || '—')}</strong></div><div class="basi-meta"><small>Place</small><strong>${esc(e.place || '—')}</strong></div></div></div>${actionButtons([{label:'Open Events',path:'/events',primary:true}])}</article>`;
+      return `<article class="basi-card"><div class="basi-card-head"><div class="basi-card-avatar">${esc((String(e.date||'').match(/[A-Z]+/)||['EV'])[0].slice(0,2))}</div><div class="basi-card-title"><strong>${esc(e.title)}</strong><span>${esc(e.tag || 'Event')}</span></div></div><div class="basi-card-body"><div class="basi-card-meta"><div class="basi-meta"><small>Date</small><strong>${esc(e.date || '—')}</strong></div><div class="basi-meta"><small>Time</small><strong>${esc(e.time || '—')}</strong></div><div class="basi-meta"><small>Place</small><strong>${esc(e.place || '—')}</strong></div></div></div></article>`;
     }
     if(card.type==='page'){
       const p=card.page || {};
-      return `<article class="basi-card"><div class="basi-card-head"><div class="basi-card-avatar">↗</div><div class="basi-card-title"><strong>${esc(card.route.label)}</strong><span>${esc(p?.eyebrow || 'Site page')}</span></div></div><div class="basi-card-body"><p>${esc(p?.body || p?.title || 'More information is available on this page.')}</p></div>${actionButtons([{label:`Open ${card.route.label}`,path:card.route.path,primary:true}])}</article>`;
+      return `<article class="basi-card"><div class="basi-card-head"><div class="basi-card-avatar">↗</div><div class="basi-card-title"><strong>${esc(card.route.label)}</strong><span>${esc(p?.eyebrow || 'Site page')}</span></div></div><div class="basi-card-body"><p>${esc(p?.body || p?.title || 'More information is available on this page.')}</p></div></article>`;
     }
     if(card.type==='form'){
       const f=cfg.googleForms?.[card.kind];
@@ -144,7 +144,7 @@
       const el=document.createElement('div');el.className=`basi-message${user?' user':''}`;
       const label=user?'You':'Basi';el.innerHTML=`<div class="basi-label">${label}</div><div>${esc(text)}</div>${card?cardMarkup(card):''}`;
       const cardActions=card?.type ? (card.type==='candidate'?[{label:'View candidates',path:'/vote',primary:true}]:card.type==='event'?[{label:'Open Events',path:'/events',primary:true}]:card.type==='page'?[{label:`Open ${card.route.label}`,path:card.route.path,primary:true}]:card.type==='form'?[{label:card.kind==='apply'?'Open application':'Open ballot',embed:card.kind,primary:true},{label:card.kind==='apply'?'Go to Apply':'Go to Vote',path:card.kind==='apply'?'/apply':'/vote'}]:[]) : [];
-      const allActions=[...actions,...cardActions];
+      const allActions=[...actions,...cardActions].filter((a,i,list)=>i===list.findIndex(b=>String(b.label||'')===String(a.label||'')&&String(b.path||'')===String(a.path||'')&&String(b.embed||'')===String(a.embed||'')));
       if(allActions.length){const box=document.createElement('div');box.className='basi-buttons';allActions.forEach(a=>{const b=document.createElement('button');b.type='button';b.className=`basi-choice${a.primary?' primary':''}`;b.textContent=a.label||'Open';b.onclick=()=>{if(a.run)a.run();else if(a.tour)runTour();else if(a.embed)window.BASI_EMBEDS?.open?.(a.embed);else if(a.path){panel.hidden=true;navigate(a.path)}else if(a.question){const r=response(a.question);setTimeout(()=>emitToMessages(r.text,false,r.card,r.actions||[]),100)}};box.appendChild(b)});el.appendChild(box)}
       messages.appendChild(el);messages.scrollTop=messages.scrollHeight;
     };
