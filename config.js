@@ -100,10 +100,11 @@ window.SITE_CONFIG = {
   results: {
     enabled: true,
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTjESC7btbBe1Lkj2iCJJxLvizekEqFZihAKJUdgO0uehtiXAaAdnkTk_hgAkzhP4tytUvn4ygPVYT0/pub?gid=708436367&single=true&output=csv',
-    refreshMs: 15000,
+    refreshMs: 3000,
     timestampColumn: 'Timestamp',
     positions: [
-      { title: 'Student Representatives', columns: ['Choose your Student Representatives'] },
+      { title: '6th Grade Representative', columns: [{ name: 'Choose your Student Representatives', occurrence: 1 }], grade: '6' },
+      { title: '7th Grade Representative', columns: [{ name: 'Choose your Student Representatives', occurrence: 2 }], grade: '7' },
       { title: 'President', columns: ['Choose your President'] },
       { title: 'Vice President', columns: ['Choose your Vice President'] },
       { title: 'Treasurer', columns: ['Choose your Treasurer'] },
